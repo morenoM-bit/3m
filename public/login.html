@@ -491,10 +491,8 @@
     </div>
 
     <script>
-        // CONFIG BACKEND URL
-        const BACKEND_URL = window.location.origin.includes('vercel.app') 
-            ? window.location.origin 
-            : 'https://3m-r3if.vercel.app';
+        // CONFIG BACKEND URL (Dinamis membaca domain aktif saat ini)
+        const BACKEND_URL = window.location.origin;
 
         const form = document.getElementById('loginForm');
         const submitBtn = document.getElementById('submitBtn');
