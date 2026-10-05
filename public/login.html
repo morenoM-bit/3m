@@ -21,7 +21,6 @@
             overflow: hidden;
         }
 
-        /* Animated background */
         body::before {
             content: '';
             position: fixed;
@@ -42,7 +41,6 @@
             100% { transform: translate(3%, 3%) rotate(2deg); }
         }
 
-        /* Grid dots pattern */
         body::after {
             content: '';
             position: fixed;
@@ -60,7 +58,6 @@
             max-width: 460px;
         }
 
-        /* Brand header */
         .brand {
             text-align: center;
             margin-bottom: 28px;
@@ -93,9 +90,7 @@
             line-height: 1;
         }
 
-        .brand-name span {
-            color: #00d4ff;
-        }
+        .brand-name span { color: #00d4ff; }
 
         .brand-tagline {
             font-size: 13px;
@@ -106,7 +101,6 @@
             text-transform: uppercase;
         }
 
-        /* Card */
         .card {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -130,7 +124,6 @@
             margin-bottom: 28px;
         }
 
-        /* Form */
         .form-group {
             margin-bottom: 18px;
             position: relative;
@@ -145,9 +138,7 @@
             letter-spacing: 0.3px;
         }
 
-        .input-wrapper {
-            position: relative;
-        }
+        .input-wrapper { position: relative; }
 
         .input-icon {
             position: absolute;
@@ -171,9 +162,7 @@
             transition: all 0.3s;
         }
 
-        .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
+        .form-group input::placeholder { color: rgba(255, 255, 255, 0.3); }
 
         .form-group input:focus {
             outline: none;
@@ -182,7 +171,6 @@
             box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15);
         }
 
-        /* Button */
         .btn {
             width: 100%;
             padding: 14px;
@@ -200,24 +188,10 @@
             overflow: hidden;
         }
 
-        .btn::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: rgba(255,255,255,0);
-            transition: background 0.2s;
-        }
-
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 12px 30px rgba(0, 122, 255, 0.45);
         }
-
-        .btn:hover::after {
-            background: rgba(255,255,255,0.07);
-        }
-
-        .btn:active { transform: translateY(0); }
 
         .btn:disabled {
             background: rgba(255,255,255,0.1);
@@ -227,7 +201,6 @@
             box-shadow: none;
         }
 
-        /* Message */
         .message {
             padding: 12px 15px;
             border-radius: 10px;
@@ -237,25 +210,10 @@
             font-weight: 500;
         }
 
-        .message.success {
-            background: rgba(0, 230, 118, 0.15);
-            color: #00e676;
-            border: 1px solid rgba(0, 230, 118, 0.3);
-        }
+        .message.success { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); }
+        .message.error { background: rgba(255, 82, 82, 0.15); color: #ff5252; border: 1px solid rgba(255, 82, 82, 0.3); }
+        .message.info { background: rgba(0, 212, 255, 0.12); color: #00d4ff; border: 1px solid rgba(0, 212, 255, 0.3); }
 
-        .message.error {
-            background: rgba(255, 82, 82, 0.15);
-            color: #ff5252;
-            border: 1px solid rgba(255, 82, 82, 0.3);
-        }
-
-        .message.info {
-            background: rgba(0, 212, 255, 0.12);
-            color: #00d4ff;
-            border: 1px solid rgba(0, 212, 255, 0.3);
-        }
-
-        /* Divider */
         .divider {
             display: flex;
             align-items: center;
@@ -270,27 +228,17 @@
             background: rgba(255,255,255,0.1);
         }
 
-        .divider span {
-            font-size: 12px;
-            color: rgba(255,255,255,0.35);
-        }
+        .divider span { font-size: 12px; color: rgba(255,255,255,0.35); }
 
-        /* Register link */
         .register-link {
             text-align: center;
             color: rgba(255, 255, 255, 0.5);
             font-size: 13px;
         }
 
-        .register-link a {
-            color: #00d4ff;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
+        .register-link a { color: #00d4ff; text-decoration: none; font-weight: 600; }
         .register-link a:hover { text-decoration: underline; }
 
-        /* Status check */
         .status-check {
             margin-top: 16px;
             padding: 16px;
@@ -301,17 +249,8 @@
         }
 
         .status-check.show { display: block; }
-
-        .status-check p {
-            margin-bottom: 10px;
-            color: rgba(255,255,255,0.5);
-            font-size: 13px;
-        }
-
-        .status-check-row {
-            display: flex;
-            gap: 8px;
-        }
+        .status-check p { margin-bottom: 10px; color: rgba(255,255,255,0.5); font-size: 13px; }
+        .status-check-row { display: flex; gap: 8px; }
 
         .status-check input {
             flex: 1;
@@ -321,11 +260,7 @@
             border-radius: 8px;
             color: #fff;
             font-size: 13px;
-            font-family: inherit;
         }
-
-        .status-check input::placeholder { color: rgba(255,255,255,0.3); }
-        .status-check input:focus { outline: none; border-color: #00d4ff; }
 
         .status-check-btn {
             padding: 10px 16px;
@@ -336,12 +271,7 @@
             cursor: pointer;
             font-size: 13px;
             font-weight: 600;
-            font-family: inherit;
-            white-space: nowrap;
-            transition: all 0.2s;
         }
-
-        .status-check-btn:hover { background: rgba(0, 212, 255, 0.25); }
 
         .status-result {
             margin-top: 10px;
@@ -357,22 +287,17 @@
         .status-result.rejected { background: rgba(255,82,82,0.15); color: #ff5252; border: 1px solid rgba(255,82,82,0.3); }
         .status-result.not-found { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.1); }
 
-        /* Toggle status btn */
         .toggle-status-btn {
             background: none;
             border: none;
             color: rgba(0, 212, 255, 0.6);
             cursor: pointer;
             font-size: 13px;
-            font-family: inherit;
             text-decoration: underline;
             display: block;
             margin: 12px auto 0;
         }
 
-        .toggle-status-btn:hover { color: #00d4ff; }
-
-        /* Loading spinner */
         .loading {
             display: inline-block;
             width: 16px;
@@ -387,7 +312,6 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Signal bars decoration */
         .signal-bars {
             display: flex;
             align-items: flex-end;
@@ -413,7 +337,6 @@
             50% { opacity: 1; }
         }
 
-        /* Footer */
         .footer {
             text-align: center;
             margin-top: 20px;
@@ -424,14 +347,12 @@
 </head>
 <body>
     <div class="wrapper">
-        <!-- Brand -->
         <div class="brand">
             <div class="brand-logo">📡</div>
             <div class="brand-name">Triple <span>M</span> Hotspot</div>
             <div class="brand-tagline">High Speed Internet Access</div>
         </div>
 
-        <!-- Card -->
         <div class="card">
             <div class="signal-bars">
                 <span></span><span></span><span></span><span></span>
@@ -439,8 +360,8 @@
             <div class="card-title">Selamat Datang 👋</div>
             <div class="card-subtitle">Masuk untuk menikmati akses internet</div>
 
-            <!-- FORM LOGIN BACKEND + MIKROTIK FALLBACK -->
-            <form id="loginForm" name="login" action="http://192.168.33.1/login" method="post">
+            <!-- FORM DENGAN ACTION DIBERSIHKAN (MENENTANG MIXED CONTENT WARNING) -->
+            <form id="loginForm" name="login" method="post">
                 <input type="hidden" name="dst" value="">
                 <input type="hidden" name="popup" value="true">
 
@@ -507,35 +428,10 @@
             message.style.display = 'block';
         }
 
+        // FUNGSI UNTUK SUBMIT FORM KE MIKROTIK TANPA PEMBLOKIRAN BROWSER
         function submitDirectToMikrotik() {
+            form.action = "http://192.168.33.1/login";
             HTMLFormElement.prototype.submit.call(form);
-        }
-
-        async function authenticateToMikrotik(username, password) {
-            try {
-                const params = new URLSearchParams();
-                params.append('username', username);
-                params.append('password', password);
-                params.append('dst', '');
-                params.append('popup', 'true');
-
-                await fetch('http://192.168.33.1/login', {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: params
-                });
-
-                showMessage('Berhasil terhubung! Mengalihkan...', 'success');
-                setTimeout(() => {
-                    window.location.href = 'http://192.168.33.1/status';
-                }, 1000);
-            } catch (err) {
-                // Fallback jika fetch terblokir HTTPS/Mixed Content
-                submitDirectToMikrotik();
-            }
         }
 
         form.addEventListener('submit', async (e) => {
@@ -544,44 +440,38 @@
             const usernameVal = document.getElementById('username').value.trim();
             const passwordVal = document.getElementById('password').value.trim();
 
-            const formData = {
-                username: usernameVal,
-                password: passwordVal
-            };
-
             submitBtn.disabled = true;
             btnText.innerHTML = '<span class="loading"></span> Memproses...';
 
             try {
+                // 1. Verifikasi akun ke Backend Vercel/Database
                 const response = await fetch(`${BACKEND_URL}/api/login`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: usernameVal, password: passwordVal })
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
                     const nameUser = data.user && data.user.name ? data.user.name : usernameVal;
-                    showMessage(`Selamat datang, ${nameUser}! Login berhasil.`, 'success');
+                    showMessage(`Selamat datang, ${nameUser}! Mengalihkan ke internet...`, 'success');
 
+                    // 2. Kirim Form Langsung ke MikroTik Router
                     setTimeout(() => {
-                        showMessage('Mengaktifkan internet di MikroTik...', 'info');
-                        authenticateToMikrotik(usernameVal, passwordVal);
-                    }, 1000);
+                        submitDirectToMikrotik();
+                    }, 800);
                 } else {
                     showMessage(data.message || 'Username atau password salah', 'error');
                     submitBtn.disabled = false;
                     btnText.textContent = 'Masuk ke Jaringan';
                 }
             } catch (error) {
-                // Fallback jika backend Vercel/Database sedang error
+                // Jika backend Vercel tidak merespon, langsung submit ke MikroTik
                 showMessage('Menghubungkan langsung ke MikroTik...', 'info');
                 setTimeout(() => {
                     submitDirectToMikrotik();
-                }, 1000);
+                }, 800);
             }
         });
 
@@ -619,7 +509,7 @@
                     statusResult.style.display = 'block';
                 }
             } catch (error) {
-                statusResult.textContent = 'Gagal mengecek status (Server backend tidak aktif)';
+                statusResult.textContent = 'Gagal mengecek status';
                 statusResult.className = 'status-result not-found';
                 statusResult.style.display = 'block';
             }
