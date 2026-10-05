@@ -97,9 +97,11 @@ app.post('/api/approve', async (req, res) => {
     // Update user status in storage
     await storageConfig.approveUser(username, adminName);
     
-    // Add user to Mikrotik hotspot
+    // Add user to Mikrotik hotspot jika fungsi tersedia
     const userData = await storageConfig.getUserByUsername(username);
-    await mikrotikConfig.addUserToHotspot(userData.username, userData.password);
+    if (mikrotikConfig.addUserToHotspot && typeof mikrotikConfig.addUserToHotspot === 'function') {
+      await mikrotikConfig.addUserToHotspot(userData.username, userData.password);
+    }
     
     res.json({ success: true, message: 'User approved successfully' });
   } catch (error) {
@@ -132,7 +134,9 @@ app.delete('/api/users/:username', async (req, res) => {
     const { username } = req.params;
     
     await storageConfig.deleteUser(username);
-    await mikrotikConfig.removeUserFromHotspot(username);
+    if (mikrotikConfig.removeUserFromHotspot && typeof mikrotikConfig.removeUserFromHotspot === 'function') {
+      await mikrotikConfig.removeUserFromHotspot(username);
+    }
     
     res.json({ success: true, message: 'User deleted successfully' });
   } catch (error) {
@@ -141,7 +145,7 @@ app.delete('/api/users/:username', async (req, res) => {
   }
 });
 
-// Validate login
+// Validate login (DIPERBARUI DENGAN SAFE CHECK UNTUK MIKROTIK)
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -164,20 +168,21 @@ app.post('/api/login', async (req, res) => {
     
     // Check if user is approved
     if (user.status !== 'approved') {
-      return res.status(403).json({ success: false, message: 'User not approved yet' });
+      return res.status(403).json({ success: false, message: `Akun belum disetujui admin. Status saat ini: ${user.status || 'pending'}` });
     }
     
-    // Validate with Mikrotik
-    const mikrotikResult = await mikrotikConfig.validateLogin(username, password);
-    
-    if (mikrotikResult.success) {
-      res.json({ success: true, message: 'Login successful', user: { name: user.name, username: user.username } });
-    } else {
-      res.status(401).json({ success: false, message: mikrotikResult.message });
+    // Validate with Mikrotik jika fungsinya ada
+    if (mikrotikConfig.validateLogin && typeof mikrotikConfig.validateLogin === 'function') {
+      const mikrotikResult = await mikrotikConfig.validateLogin(username, password);
+      if (!mikrotikResult.success) {
+        return res.status(401).json({ success: false, message: mikrotikResult.message });
+      }
     }
+    
+    return res.json({ success: true, message: 'Login successful', user: { name: user.name, username: user.username } });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ success: false, message: 'Login failed' });
+    res.status(500).json({ success: false, message: 'Login failed: ' + error.message });
   }
 });
 
