@@ -1,8 +1,3 @@
-// Izinkan sertifikat SSL self-signed MikroTik di Node.js / Vercel fetch
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
-const https = require('https');
-
 class MikrotikConfig {
   constructor() {
     this.host = process.env.MIKROTIK_HOST || process.env.MIKROTIK_IP;
@@ -11,18 +6,11 @@ class MikrotikConfig {
     this.port = process.env.MIKROTIK_PORT || process.env.MIKROTIK_API_PORT || 3111;
   }
 
-  // Agent untuk mengabaikan error SSL certificate bawaan MikroTik
-  getHttpsAgent() {
-    return new https.Agent({
-      rejectUnauthorized: false
-    });
-  }
-
   // Fungsi otomatis menambahkan user ke Hotspot MikroTik v7 via REST API
   async addUserToHotspot(username, password, profile = 'default') {
     try {
       const auth = Buffer.from(`${this.user}:${this.password}`).toString('base64');
-      const url = `https://${this.host}:${this.port}/rest/ip/hotspot/user/add`;
+      const url = `http://${this.host}:${this.port}/rest/ip/hotspot/user/add`;
 
       const response = await fetch(url, {
         method: 'PUT',
@@ -34,14 +22,14 @@ class MikrotikConfig {
           name: username,
           password: password,
           profile: profile
-        }),
-        agent: this.getHttpsAgent()
+        })
       });
 
+      const responseText = await response.text();
+
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('MikroTik REST API Error:', errorText);
-        return { success: false, message: `Error MikroTik: ${errorText}` };
+        console.error('MikroTik REST API Error:', responseText);
+        return { success: false, message: `Error MikroTik: ${responseText}` };
       }
 
       console.log(`Berhasil menambahkan user ${username} ke MikroTik Hotspot!`);
@@ -56,12 +44,9 @@ class MikrotikConfig {
   async removeUserFromHotspot(username) {
     try {
       const auth = Buffer.from(`${this.user}:${this.password}`).toString('base64');
-      const agent = this.getHttpsAgent();
       
-      // Cari ID user berdasarkan nama (Gunakan HTTPS)
-      const findRes = await fetch(`https://${this.host}:${this.port}/rest/ip/hotspot/user?name=${username}`, {
-        headers: { 'Authorization': `Basic ${auth}` },
-        agent: agent
+      const findRes = await fetch(`http://${this.host}:${this.port}/rest/ip/hotspot/user?name=${username}`, {
+        headers: { 'Authorization': `Basic ${auth}` }
       });
       
       const users = await findRes.json();
@@ -71,11 +56,9 @@ class MikrotikConfig {
 
       const userId = users[0]['.id'];
       
-      // Hapus user berdasarkan ID (Gunakan HTTPS)
-      const delRes = await fetch(`https://${this.host}:${this.port}/rest/ip/hotspot/user/${userId}`, {
+      const delRes = await fetch(`http://${this.host}:${this.port}/rest/ip/hotspot/user/${userId}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Basic ${auth}` },
-        agent: agent
+        headers: { 'Authorization': `Basic ${auth}` }
       });
 
       if (!delRes.ok) {
