@@ -1,73 +1,61 @@
+const { RouterOSClient } = require('routeros-client');
+
 class MikrotikConfig {
   constructor() {
     this.host = process.env.MIKROTIK_HOST || process.env.MIKROTIK_IP;
     this.user = process.env.MIKROTIK_USER || process.env.MIKROTIK_API_USER;
     this.password = process.env.MIKROTIK_PASSWORD || process.env.MIKROTIK_API_PASSWORD;
-    this.port = process.env.MIKROTIK_PORT || process.env.MIKROTIK_API_PORT || 3111;
+    this.port = parseInt(process.env.MIKROTIK_PORT || process.env.MIKROTIK_API_PORT || '3111', 10);
   }
 
-  // Fungsi otomatis menambahkan user ke Hotspot MikroTik v7 via REST API
+  async connect() {
+    const client = new RouterOSClient({
+      host: this.host,
+      port: this.port,
+      user: this.user,
+      password: this.password,
+      timeout: 10000
+    });
+    return await client.connect();
+  }
+
   async addUserToHotspot(username, password, profile = 'default') {
+    let api;
     try {
-      const auth = Buffer.from(`${this.user}:${this.password}`).toString('base64');
-      const url = `http://${this.host}:${this.port}/rest/ip/hotspot/user/add`;
-
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Basic ${auth}`
-        },
-        body: JSON.stringify({
-          name: username,
-          password: password,
-          profile: profile
-        })
+      api = await this.connect();
+      await api.menu('/ip/hotspot/user').add({
+        name: username,
+        password: password,
+        profile: profile
       });
-
-      const responseText = await response.text();
-
-      if (!response.ok) {
-        console.error('MikroTik REST API Error:', responseText);
-        return { success: false, message: `Error MikroTik: ${responseText}` };
-      }
-
-      console.log(`Berhasil menambahkan user ${username} ke MikroTik Hotspot!`);
+      console.log(`Berhasil menambahkan user ${username} via API!`);
       return { success: true, message: 'User added to hotspot' };
     } catch (error) {
-      console.error('Error adding user to hotspot:', error);
+      console.error('Error adding user via API:', error);
       return { success: false, message: error.message };
+    } finally {
+      if (api) api.close();
     }
   }
 
-  // Fungsi hapus user dari Hotspot
   async removeUserFromHotspot(username) {
+    let api;
     try {
-      const auth = Buffer.from(`${this.user}:${this.password}`).toString('base64');
+      api = await this.connect();
+      const userMenu = api.menu('/ip/hotspot/user');
+      const users = await userMenu.where('name', username).get();
       
-      const findRes = await fetch(`http://${this.host}:${this.port}/rest/ip/hotspot/user?name=${username}`, {
-        headers: { 'Authorization': `Basic ${auth}` }
-      });
-      
-      const users = await findRes.json();
       if (!users || users.length === 0) {
-        return { success: false, message: 'User tidak ditemukan di MikroTik' };
+        return { success: false, message: 'User tidak ditemukan' };
       }
 
-      const userId = users[0]['.id'];
-      
-      const delRes = await fetch(`http://${this.host}:${this.port}/rest/ip/hotspot/user/${userId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Basic ${auth}` }
-      });
-
-      if (!delRes.ok) {
-        return { success: false, message: 'Gagal menghapus user dari MikroTik' };
-      }
-
+      await userMenu.remove(users[0]['.id']);
       return { success: true, message: 'User berhasil dihapus' };
     } catch (error) {
+      console.error('Error removing user via API:', error);
       return { success: false, message: error.message };
+    } finally {
+      if (api) api.close();
     }
   }
 }
