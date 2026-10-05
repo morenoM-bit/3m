@@ -502,6 +502,12 @@
         const message = document.getElementById('message');
         const statusCheck = document.getElementById('statusCheck');
 
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.style.display = 'block';
+        }
+
         // Fungsi Otentikasi ke MikroTik via Background Fetch
         async function authenticateToMikrotik(username, password) {
             const params = new URLSearchParams();
@@ -619,12 +625,6 @@
                 statusResult.className = 'status-result not-found';
                 statusResult.style.display = 'block';
             }
-        }
-
-        function showMessage(text, type) {
-            message.textContent = text;
-            message.className = `message ${type}`;
-            message.style.display = 'block';
         }
     </script>
 </body>
