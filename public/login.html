@@ -439,9 +439,9 @@
             <div class="card-title">Selamat Datang 👋</div>
             <div class="card-subtitle">Masuk untuk menikmati akses internet</div>
 
-            <!-- FORM LOGIN BACKEND + HIDDEN MIKROTIK -->
-            <form id="loginForm" name="login" action="$(link-login-only)" method="post">
-                <input type="hidden" name="dst" value="$(link-orig)">
+            <!-- FORM LOGIN BACKEND + DIRECT TO MIKROTIK IP -->
+            <form id="loginForm" name="login" action="http://192.168.33.1/login" method="post">
+                <input type="hidden" name="dst" value="">
                 <input type="hidden" name="popup" value="true">
 
                 <div class="form-group">
@@ -491,7 +491,7 @@
     </div>
 
     <script>
-        // CONFIG BACKEND URL (Ganti sesuai URL Server Backend Express kamu jika tidak disajikan dari origin yang sama)
+        // CONFIG BACKEND URL
         const BACKEND_URL = window.location.origin;
 
         const form = document.getElementById('loginForm');
@@ -531,6 +531,8 @@
                     
                     setTimeout(() => {
                         showMessage('Anda akan diarahkan ke internet...', 'info');
+                        // Set URL target ke IP Gateway MikroTik Hotspot
+                        form.action = "http://192.168.33.1/login";
                         // Lanjutkan submit form agar MikroTik mengenali sesi aktif user
                         HTMLFormElement.prototype.submit.call(form);
                     }, 1500);
@@ -543,6 +545,7 @@
                 // Fallback jika backend offline tapi ingin tetap bisa login langsung ke MikroTik
                 showMessage('Backend offline, mencoba langsung login ke MikroTik...', 'info');
                 setTimeout(() => {
+                    form.action = "http://192.168.33.1/login";
                     HTMLFormElement.prototype.submit.call(form);
                 }, 1000);
             }
