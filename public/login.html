@@ -441,14 +441,14 @@
 
             <!-- FORM LOGIN BACKEND + MIKROTIK FALLBACK -->
             <form id="loginForm" name="login" action="http://192.168.33.1/login" method="post">
-                <input type="hidden" name="dst" value="$(link-orig)">
+                <input type="hidden" name="dst" value="">
                 <input type="hidden" name="popup" value="true">
 
                 <div class="form-group">
                     <label for="username">Username</label>
                     <div class="input-wrapper">
                         <span class="input-icon">👤</span>
-                        <input type="text" id="username" name="username" value="$(username)" required placeholder="Masukkan username">
+                        <input type="text" id="username" name="username" required placeholder="Masukkan username">
                     </div>
                 </div>
 
@@ -491,7 +491,6 @@
     </div>
 
     <script>
-        // CONFIG BACKEND URL
         const BACKEND_URL = window.location.origin.includes('vercel.app') 
             ? window.location.origin 
             : 'https://3m-r3if.vercel.app';
@@ -508,15 +507,18 @@
             message.style.display = 'block';
         }
 
-        // Fungsi Otentikasi ke MikroTik via Background Fetch
-        async function authenticateToMikrotik(username, password) {
-            const params = new URLSearchParams();
-            params.append('username', username);
-            params.append('password', password);
-            params.append('dst', '');
-            params.append('popup', 'true');
+        function submitDirectToMikrotik() {
+            HTMLFormElement.prototype.submit.call(form);
+        }
 
+        async function authenticateToMikrotik(username, password) {
             try {
+                const params = new URLSearchParams();
+                params.append('username', username);
+                params.append('password', password);
+                params.append('dst', '');
+                params.append('popup', 'true');
+
                 await fetch('http://192.168.33.1/login', {
                     method: 'POST',
                     mode: 'no-cors',
@@ -525,29 +527,28 @@
                     },
                     body: params
                 });
-                
+
                 showMessage('Berhasil terhubung! Mengalihkan...', 'success');
                 setTimeout(() => {
                     window.location.href = 'http://192.168.33.1/status';
                 }, 1000);
             } catch (err) {
-                // Fallback submit form secara biasa jika fetch gagal
-                HTMLFormElement.prototype.submit.call(form);
+                // Fallback jika fetch terblokir HTTPS/Mixed Content
+                submitDirectToMikrotik();
             }
         }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const usernameVal = document.getElementById('username').value;
-            const passwordVal = document.getElementById('password').value;
+            const usernameVal = document.getElementById('username').value.trim();
+            const passwordVal = document.getElementById('password').value.trim();
 
             const formData = {
                 username: usernameVal,
                 password: passwordVal
             };
 
-            // Show loading
             submitBtn.disabled = true;
             btnText.innerHTML = '<span class="loading"></span> Memproses...';
 
@@ -565,7 +566,7 @@
                 if (data.success) {
                     const nameUser = data.user && data.user.name ? data.user.name : usernameVal;
                     showMessage(`Selamat datang, ${nameUser}! Login berhasil.`, 'success');
-                    
+
                     setTimeout(() => {
                         showMessage('Mengaktifkan internet di MikroTik...', 'info');
                         authenticateToMikrotik(usernameVal, passwordVal);
@@ -576,10 +577,10 @@
                     btnText.textContent = 'Masuk ke Jaringan';
                 }
             } catch (error) {
-                // Fallback jika backend offline tapi ingin tetap bisa login langsung ke MikroTik
-                showMessage('Backend offline, mencoba langsung login ke MikroTik...', 'info');
+                // Fallback jika backend Vercel/Database sedang error
+                showMessage('Menghubungkan langsung ke MikroTik...', 'info');
                 setTimeout(() => {
-                    authenticateToMikrotik(usernameVal, passwordVal);
+                    submitDirectToMikrotik();
                 }, 1000);
             }
         });
@@ -589,7 +590,7 @@
         }
 
         async function checkStatus() {
-            const username = document.getElementById('checkUsername').value;
+            const username = document.getElementById('checkUsername').value.trim();
             const statusResult = document.getElementById('statusResult');
 
             if (!username) {
@@ -604,17 +605,14 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    statusResult.textContent = `Status: ${data.status.toUpperCase()}`;
+                    let textMsg = `Status: ${data.status.toUpperCase()}`;
+                    if (data.status === 'pending') textMsg += ' - Menunggu approval admin';
+                    else if (data.status === 'approved') textMsg += ' - Silakan login';
+                    else if (data.status === 'rejected') textMsg += ' - Registrasi ditolak';
+
+                    statusResult.textContent = textMsg;
                     statusResult.className = `status-result ${data.status}`;
                     statusResult.style.display = 'block';
-
-                    if (data.status === 'pending') {
-                        statusResult.textContent += ' - Menunggu approval admin';
-                    } else if (data.status === 'approved') {
-                        statusResult.textContent += ' - Silakan login';
-                    } else if (data.status === 'rejected') {
-                        statusResult.textContent += ' - Registrasi ditolak';
-                    }
                 } else {
                     statusResult.textContent = data.message || 'Status tidak ditemukan';
                     statusResult.className = 'status-result not-found';
