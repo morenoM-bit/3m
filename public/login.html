@@ -271,6 +271,11 @@
             cursor: pointer;
             font-size: 13px;
             font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .status-check-btn:hover {
+            background: rgba(0, 212, 255, 0.25);
         }
 
         .status-result {
@@ -360,11 +365,8 @@
             <div class="card-title">Selamat Datang 👋</div>
             <div class="card-subtitle">Masuk untuk menikmati akses internet</div>
 
-            <!-- FORM DENGAN ACTION DIBERSIHKAN (MENENTANG MIXED CONTENT WARNING) -->
+            <!-- FORM UNTUK INPUT DISPLAY -->
             <form id="loginForm" name="login" method="post">
-                <input type="hidden" name="dst" value="">
-                <input type="hidden" name="popup" value="true">
-
                 <div class="form-group">
                     <label for="username">Username</label>
                     <div class="input-wrapper">
@@ -386,13 +388,21 @@
                 </button>
             </form>
 
+            <!-- FORM HIDDEN KHUSUS UNTUK SUBMIT KE MIKROTIK -->
+            <form id="mtLoginForm" action="http://192.168.33.1/login" method="post" style="display: none;">
+                <input type="hidden" name="username" id="mt_username">
+                <input type="hidden" name="password" id="mt_password">
+                <input type="hidden" name="dst" value="http://www.google.com">
+                <input type="hidden" name="popup" value="true">
+            </form>
+
             <div class="message" id="message"></div>
 
             <div class="status-check" id="statusCheck">
                 <p>Cek status registrasi kamu:</p>
                 <div class="status-check-row">
-                    <input type="text" id="checkUsername" placeholder="Masukkan username">
-                    <button type="button" class="status-check-btn" onclick="checkStatus()">Cek Status</button>
+                    <input type="text" id="checkUsername" placeholder="Masukkan username" onkeypress="handleCheckStatusEnter(event)">
+                    <button type="button" class="status-check-btn" id="checkStatusBtn" onclick="checkStatus()">Cek Status</button>
                 </div>
                 <div class="status-result" id="statusResult"></div>
             </div>
@@ -428,10 +438,11 @@
             message.style.display = 'block';
         }
 
-        // FUNGSI UNTUK SUBMIT FORM KE MIKROTIK TANPA PEMBLOKIRAN BROWSER
-        function submitDirectToMikrotik() {
-            form.action = "http://192.168.33.1/login";
-            HTMLFormElement.prototype.submit.call(form);
+        // FUNGSI SUBMIT DENGAN HIDDEN FORM TERPISAH
+        function submitDirectToMikrotik(username, password) {
+            document.getElementById('mt_username').value = username;
+            document.getElementById('mt_password').value = password;
+            document.getElementById('mtLoginForm').submit();
         }
 
         form.addEventListener('submit', async (e) => {
@@ -444,7 +455,7 @@
             btnText.innerHTML = '<span class="loading"></span> Memproses...';
 
             try {
-                // 1. Verifikasi akun ke Backend Vercel/Database
+                // 1. Verifikasi akun ke Backend Vercel
                 const response = await fetch(`${BACKEND_URL}/api/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -457,9 +468,9 @@
                     const nameUser = data.user && data.user.name ? data.user.name : usernameVal;
                     showMessage(`Selamat datang, ${nameUser}! Mengalihkan ke internet...`, 'success');
 
-                    // 2. Kirim Form Langsung ke MikroTik Router
+                    // 2. Submit ke Router MikroTik
                     setTimeout(() => {
-                        submitDirectToMikrotik();
+                        submitDirectToMikrotik(usernameVal, passwordVal);
                     }, 800);
                 } else {
                     showMessage(data.message || 'Username atau password salah', 'error');
@@ -467,31 +478,51 @@
                     btnText.textContent = 'Masuk ke Jaringan';
                 }
             } catch (error) {
-                // Jika backend Vercel tidak merespon, langsung submit ke MikroTik
+                // Jika backend Vercel bermasalah, langsung alihkan submit ke MikroTik
                 showMessage('Menghubungkan langsung ke MikroTik...', 'info');
                 setTimeout(() => {
-                    submitDirectToMikrotik();
+                    submitDirectToMikrotik(usernameVal, passwordVal);
                 }, 800);
             }
         });
 
+        // FUNGSI CEK STATUS REGISTER
         function toggleStatusCheck() {
-            statusCheck.classList.toggle('show');
+            if (statusCheck.style.display === 'block' || statusCheck.classList.contains('show')) {
+                statusCheck.style.display = 'none';
+                statusCheck.classList.remove('show');
+            } else {
+                statusCheck.style.display = 'block';
+                statusCheck.classList.add('show');
+                document.getElementById('checkUsername').focus();
+            }
+        }
+
+        function handleCheckStatusEnter(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                checkStatus();
+            }
         }
 
         async function checkStatus() {
-            const username = document.getElementById('checkUsername').value.trim();
+            const usernameInput = document.getElementById('checkUsername');
+            const username = usernameInput.value.trim();
             const statusResult = document.getElementById('statusResult');
+            const checkStatusBtn = document.getElementById('checkStatusBtn');
 
             if (!username) {
-                statusResult.textContent = 'Masukkan username';
+                statusResult.textContent = 'Masukkan username terlebih dahulu';
                 statusResult.className = 'status-result not-found';
                 statusResult.style.display = 'block';
                 return;
             }
 
+            checkStatusBtn.disabled = true;
+            checkStatusBtn.innerHTML = '<span class="loading" style="width:12px;height:12px;margin-right:4px;"></span>...';
+
             try {
-                const response = await fetch(`${BACKEND_URL}/api/status/${username}`);
+                const response = await fetch(`${BACKEND_URL}/api/status/${encodeURIComponent(username)}`);
                 const data = await response.json();
 
                 if (data.success) {
@@ -501,7 +532,7 @@
                     else if (data.status === 'rejected') textMsg += ' - Registrasi ditolak';
 
                     statusResult.textContent = textMsg;
-                    statusResult.className = `status-result ${data.status}`;
+                    statusResult.className = `status-result ${data.status.toLowerCase()}`;
                     statusResult.style.display = 'block';
                 } else {
                     statusResult.textContent = data.message || 'Status tidak ditemukan';
@@ -509,9 +540,12 @@
                     statusResult.style.display = 'block';
                 }
             } catch (error) {
-                statusResult.textContent = 'Gagal mengecek status';
+                statusResult.textContent = 'Gagal mengecek status. Coba lagi nanti.';
                 statusResult.className = 'status-result not-found';
                 statusResult.style.display = 'block';
+            } finally {
+                checkStatusBtn.disabled = false;
+                checkStatusBtn.textContent = 'Cek Status';
             }
         }
     </script>
