@@ -195,12 +195,6 @@
             gap: 0 16px;
         }
 
-        .form-grid .form-group:nth-child(5),
-        .form-grid .form-group:nth-child(6) {
-            /* password fields full width each */
-        }
-
-        /* Full width override */
         .form-group.full-width {
             grid-column: 1 / -1;
         }
@@ -447,7 +441,7 @@
                     <div class="form-group">
                         <label for="email">Email</label>
                         <div class="input-wrapper">
-                            <span class="input-icon">✉️</span>
+                            <span class="input-icon">✉️️</span>
                             <input type="email" id="email" name="email" required placeholder="email@kamu.com">
                         </div>
                     </div>
@@ -510,18 +504,14 @@
     </div>
 
     <script>
-        // ========================================================
-        // GANTI URL DI BAWAH DENGAN DOMAIN VERCEL KAMU JIKA SUDAH DEPLOY
-        // ========================================================
         const BACKEND_URL = window.location.origin.includes('vercel.app') 
             ? window.location.origin 
-         : 'https://3m-r3if.vercel.app';
+            : 'https://3m-r3if.vercel.app';
         const form = document.getElementById('registerForm');
         const submitBtn = document.getElementById('submitBtn');
         const btnText = document.getElementById('btnText');
         const message = document.getElementById('message');
 
-        // Password strength checker
         function checkStrength(value) {
             const bar = document.getElementById('strengthBar');
             let strength = 0;
@@ -556,7 +546,6 @@
                 password: password
             };
 
-            // Show loading
             submitBtn.disabled = true;
             btnText.innerHTML = '<span class="loading"></span> Memproses...';
 
@@ -575,7 +564,6 @@
                     showMessage(data.message + ' Mengalihkan ke halaman login...', 'success');
                     form.reset();
 
-                    // TAMBAHAN: Redirect otomatis ke login.html setelah 2 detik
                     setTimeout(() => {
                         window.location.href = 'login.html';
                     }, 2000);
