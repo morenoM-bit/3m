@@ -439,16 +439,16 @@
             <div class="card-title">Selamat Datang 👋</div>
             <div class="card-subtitle">Masuk untuk menikmati akses internet</div>
 
-            <!-- FORM LOGIN BACKEND + DIRECT TO MIKROTIK IP -->
+            <!-- FORM LOGIN BACKEND + MIKROTIK FALLBACK -->
             <form id="loginForm" name="login" action="http://192.168.33.1/login" method="post">
-                <input type="hidden" name="dst" value="">
+                <input type="hidden" name="dst" value="$(link-orig)">
                 <input type="hidden" name="popup" value="true">
 
                 <div class="form-group">
                     <label for="username">Username</label>
                     <div class="input-wrapper">
                         <span class="input-icon">👤</span>
-                        <input type="text" id="username" name="username" value="" required placeholder="Masukkan username">
+                        <input type="text" id="username" name="username" value="$(username)" required placeholder="Masukkan username">
                     </div>
                 </div>
 
@@ -492,13 +492,43 @@
 
     <script>
         // CONFIG BACKEND URL
-        const BACKEND_URL = window.location.origin;
+        const BACKEND_URL = window.location.origin.includes('vercel.app') 
+            ? window.location.origin 
+            : 'https://3m-r3if.vercel.app';
 
         const form = document.getElementById('loginForm');
         const submitBtn = document.getElementById('submitBtn');
         const btnText = document.getElementById('btnText');
         const message = document.getElementById('message');
         const statusCheck = document.getElementById('statusCheck');
+
+        // Fungsi Otentikasi ke MikroTik via Background Fetch
+        async function authenticateToMikrotik(username, password) {
+            const params = new URLSearchParams();
+            params.append('username', username);
+            params.append('password', password);
+            params.append('dst', '');
+            params.append('popup', 'true');
+
+            try {
+                await fetch('http://192.168.33.1/login', {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: params
+                });
+                
+                showMessage('Berhasil terhubung! Mengalihkan...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'http://192.168.33.1/status';
+                }, 1000);
+            } catch (err) {
+                // Fallback submit form secara biasa jika fetch gagal
+                HTMLFormElement.prototype.submit.call(form);
+            }
+        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -527,17 +557,15 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showMessage(`Selamat datang, ${data.user.name || usernameVal}! Login berhasil.`, 'success');
+                    const nameUser = data.user && data.user.name ? data.user.name : usernameVal;
+                    showMessage(`Selamat datang, ${nameUser}! Login berhasil.`, 'success');
                     
                     setTimeout(() => {
-                        showMessage('Anda akan diarahkan ke internet...', 'info');
-                        // Set URL target ke IP Gateway MikroTik Hotspot
-                        form.action = "http://192.168.33.1/login";
-                        // Lanjutkan submit form agar MikroTik mengenali sesi aktif user
-                        HTMLFormElement.prototype.submit.call(form);
-                    }, 1500);
+                        showMessage('Mengaktifkan internet di MikroTik...', 'info');
+                        authenticateToMikrotik(usernameVal, passwordVal);
+                    }, 1000);
                 } else {
-                    showMessage(data.message, 'error');
+                    showMessage(data.message || 'Username atau password salah', 'error');
                     submitBtn.disabled = false;
                     btnText.textContent = 'Masuk ke Jaringan';
                 }
@@ -545,8 +573,7 @@
                 // Fallback jika backend offline tapi ingin tetap bisa login langsung ke MikroTik
                 showMessage('Backend offline, mencoba langsung login ke MikroTik...', 'info');
                 setTimeout(() => {
-                    form.action = "http://192.168.33.1/login";
-                    HTMLFormElement.prototype.submit.call(form);
+                    authenticateToMikrotik(usernameVal, passwordVal);
                 }, 1000);
             }
         });
@@ -583,7 +610,7 @@
                         statusResult.textContent += ' - Registrasi ditolak';
                     }
                 } else {
-                    statusResult.textContent = data.message;
+                    statusResult.textContent = data.message || 'Status tidak ditemukan';
                     statusResult.className = 'status-result not-found';
                     statusResult.style.display = 'block';
                 }
