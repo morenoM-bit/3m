@@ -1,3 +1,6 @@
+// Izinkan sertifikat SSL self-signed MikroTik di Node.js / Vercel fetch
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const https = require('https');
 
 class MikrotikConfig {
