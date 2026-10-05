@@ -1,3 +1,5 @@
+const https = require('https');
+
 class MikrotikConfig {
   constructor() {
     this.host = process.env.MIKROTIK_HOST || process.env.MIKROTIK_IP;
@@ -6,11 +8,18 @@ class MikrotikConfig {
     this.port = process.env.MIKROTIK_PORT || process.env.MIKROTIK_API_PORT || 3111;
   }
 
+  // Agent untuk mengabaikan error SSL certificate bawaan MikroTik
+  getHttpsAgent() {
+    return new https.Agent({
+      rejectUnauthorized: false
+    });
+  }
+
   // Fungsi otomatis menambahkan user ke Hotspot MikroTik v7 via REST API
   async addUserToHotspot(username, password, profile = 'default') {
     try {
       const auth = Buffer.from(`${this.user}:${this.password}`).toString('base64');
-      const url = `http://${this.host}:${this.port}/rest/ip/hotspot/user/add`;
+      const url = `https://${this.host}:${this.port}/rest/ip/hotspot/user/add`;
 
       const response = await fetch(url, {
         method: 'PUT',
@@ -22,7 +31,8 @@ class MikrotikConfig {
           name: username,
           password: password,
           profile: profile
-        })
+        }),
+        agent: this.getHttpsAgent()
       });
 
       if (!response.ok) {
@@ -39,14 +49,16 @@ class MikrotikConfig {
     }
   }
 
-  // Fungsi hapus user dari Hotspot (opsional jika dibutuhkan)
+  // Fungsi hapus user dari Hotspot
   async removeUserFromHotspot(username) {
     try {
       const auth = Buffer.from(`${this.user}:${this.password}`).toString('base64');
+      const agent = this.getHttpsAgent();
       
-      // Cari ID user berdasarkan nama
-      const findRes = await fetch(`http://${this.host}:${this.port}/rest/ip/hotspot/user?name=${username}`, {
-        headers: { 'Authorization': `Basic ${auth}` }
+      // Cari ID user berdasarkan nama (Gunakan HTTPS)
+      const findRes = await fetch(`https://${this.host}:${this.port}/rest/ip/hotspot/user?name=${username}`, {
+        headers: { 'Authorization': `Basic ${auth}` },
+        agent: agent
       });
       
       const users = await findRes.json();
@@ -56,10 +68,11 @@ class MikrotikConfig {
 
       const userId = users[0]['.id'];
       
-      // Hapus user berdasarkan ID
-      const delRes = await fetch(`http://${this.host}:${this.port}/rest/ip/hotspot/user/${userId}`, {
+      // Hapus user berdasarkan ID (Gunakan HTTPS)
+      const delRes = await fetch(`https://${this.host}:${this.port}/rest/ip/hotspot/user/${userId}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Basic ${auth}` }
+        headers: { 'Authorization': `Basic ${auth}` },
+        agent: agent
       });
 
       if (!delRes.ok) {
