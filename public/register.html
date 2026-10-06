@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Triple M Hotspot - Registrasi</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background: #0a0e1a;
             min-height: 100vh;
             display: flex;
@@ -58,7 +56,6 @@
             max-width: 520px;
         }
 
-        /* Brand */
         .brand {
             text-align: center;
             margin-bottom: 24px;
@@ -100,7 +97,6 @@
             text-transform: uppercase;
         }
 
-        /* Card */
         .card {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -124,7 +120,6 @@
             margin-bottom: 28px;
         }
 
-        /* Progress steps */
         .steps {
             display: flex;
             align-items: center;
@@ -164,12 +159,6 @@
             box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
         }
 
-        .step.done .step-circle {
-            border-color: #00e676;
-            background: rgba(0, 230, 118, 0.15);
-            color: #00e676;
-        }
-
         .step-label {
             font-size: 10px;
             color: rgba(255,255,255,0.3);
@@ -179,7 +168,6 @@
         }
 
         .step.active .step-label { color: #00d4ff; }
-        .step.done .step-label { color: #00e676; }
 
         .step-line {
             flex: 1;
@@ -188,20 +176,15 @@
             margin-bottom: 20px;
         }
 
-        /* Grid layout for form */
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0 16px;
         }
 
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
+        .form-group.full-width { grid-column: 1 / -1; }
 
-        .form-group {
-            margin-bottom: 16px;
-        }
+        .form-group { margin-bottom: 16px; }
 
         .form-group label {
             display: block;
@@ -212,9 +195,7 @@
             letter-spacing: 0.3px;
         }
 
-        .input-wrapper {
-            position: relative;
-        }
+        .input-wrapper { position: relative; }
 
         .input-icon {
             position: absolute;
@@ -247,7 +228,6 @@
             box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.12);
         }
 
-        /* Password strength bar */
         .password-strength {
             margin-top: 6px;
             height: 3px;
@@ -263,7 +243,6 @@
             transition: all 0.3s;
         }
 
-        /* Button */
         .btn {
             width: 100%;
             padding: 14px;
@@ -276,7 +255,6 @@
             font-family: inherit;
             cursor: pointer;
             transition: all 0.3s;
-            letter-spacing: 0.3px;
             margin-top: 8px;
             position: relative;
             overflow: hidden;
@@ -287,8 +265,6 @@
             box-shadow: 0 12px 30px rgba(0, 122, 255, 0.45);
         }
 
-        .btn:active { transform: translateY(0); }
-
         .btn:disabled {
             background: rgba(255,255,255,0.1);
             color: rgba(255,255,255,0.4);
@@ -297,7 +273,6 @@
             box-shadow: none;
         }
 
-        /* Message */
         .message {
             padding: 12px 15px;
             border-radius: 10px;
@@ -319,7 +294,6 @@
             border: 1px solid rgba(255, 82, 82, 0.3);
         }
 
-        /* Divider */
         .divider {
             display: flex;
             align-items: center;
@@ -339,7 +313,6 @@
             color: rgba(255,255,255,0.3);
         }
 
-        /* Login link */
         .login-link {
             text-align: center;
             color: rgba(255, 255, 255, 0.45);
@@ -352,9 +325,6 @@
             font-weight: 600;
         }
 
-        .login-link a:hover { text-decoration: underline; }
-
-        /* Loading */
         .loading {
             display: inline-block;
             width: 16px;
@@ -369,7 +339,6 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Footer */
         .footer {
             text-align: center;
             margin-top: 18px;
@@ -377,7 +346,6 @@
             font-size: 11px;
         }
 
-        /* Terms note */
         .terms-note {
             font-size: 11px;
             color: rgba(255,255,255,0.3);
@@ -387,30 +355,23 @@
         }
 
         @media (max-width: 480px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            .card {
-                padding: 28px 20px;
-            }
+            .form-grid { grid-template-columns: 1fr; }
+            .card { padding: 28px 20px; }
         }
     </style>
 </head>
 <body>
     <div class="wrapper">
-        <!-- Brand -->
         <div class="brand">
             <div class="brand-logo">📡</div>
             <div class="brand-name">Triple <span>M</span> Hotspot</div>
             <div class="brand-tagline">High Speed Internet Access</div>
         </div>
 
-        <!-- Card -->
         <div class="card">
             <div class="card-title">Buat Akun Baru ✨</div>
             <div class="card-subtitle">Isi data diri kamu untuk mendaftar</div>
 
-            <!-- Progress steps visual -->
             <div class="steps">
                 <div class="step active">
                     <div class="step-circle">1</div>
@@ -441,7 +402,7 @@
                     <div class="form-group">
                         <label for="email">Email</label>
                         <div class="input-wrapper">
-                            <span class="input-icon">✉️️</span>
+                            <span class="input-icon">✉</span>
                             <input type="email" id="email" name="email" required placeholder="email@kamu.com">
                         </div>
                     </div>
@@ -504,9 +465,9 @@
     </div>
 
     <script>
-        const BACKEND_URL = window.location.origin.includes('vercel.app') 
-            ? window.location.origin 
-            : 'https://3m-r3if.vercel.app';
+        // Dipatenkan langsung ke Vercel
+        const BACKEND_URL = 'https://3m-r3if.vercel.app';
+        
         const form = document.getElementById('registerForm');
         const submitBtn = document.getElementById('submitBtn');
         const btnText = document.getElementById('btnText');
@@ -560,18 +521,18 @@
 
                 const data = await response.json();
 
-                if (data.success) {
-                    showMessage(data.message + ' Mengalihkan ke halaman login...', 'success');
+                if (response.ok && data.success) {
+                    showMessage(data.message || 'Registrasi berhasil! Mengalihkan...', 'success');
                     form.reset();
 
                     setTimeout(() => {
                         window.location.href = 'login.html';
                     }, 2000);
                 } else {
-                    showMessage(data.message, 'error');
+                    showMessage(data.message || 'Gagal mendaftar. Silakan coba lagi.', 'error');
                 }
             } catch (error) {
-                showMessage('Terjadi kesalahan koneksi ke server backend.', 'error');
+                showMessage('Gagal terhubung ke server backend Vercel.', 'error');
             } finally {
                 submitBtn.disabled = false;
                 btnText.textContent = 'Daftar Sekarang';
