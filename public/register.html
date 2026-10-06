@@ -120,62 +120,6 @@
             margin-bottom: 28px;
         }
 
-        .steps {
-            display: flex;
-            align-items: center;
-            margin-bottom: 28px;
-            gap: 0;
-        }
-
-        .step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
-            position: relative;
-        }
-
-        .step-circle {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.15);
-            background: rgba(255,255,255,0.05);
-            color: rgba(255,255,255,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            font-weight: 600;
-            position: relative;
-            z-index: 1;
-            transition: all 0.3s;
-        }
-
-        .step.active .step-circle {
-            border-color: #00d4ff;
-            background: rgba(0, 212, 255, 0.15);
-            color: #00d4ff;
-            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
-        }
-
-        .step-label {
-            font-size: 10px;
-            color: rgba(255,255,255,0.3);
-            margin-top: 5px;
-            text-align: center;
-            font-weight: 500;
-        }
-
-        .step.active .step-label { color: #00d4ff; }
-
-        .step-line {
-            flex: 1;
-            height: 1px;
-            background: rgba(255,255,255,0.1);
-            margin-bottom: 20px;
-        }
-
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -183,7 +127,6 @@
         }
 
         .form-group.full-width { grid-column: 1 / -1; }
-
         .form-group { margin-bottom: 16px; }
 
         .form-group label {
@@ -228,21 +171,6 @@
             box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.12);
         }
 
-        .password-strength {
-            margin-top: 6px;
-            height: 3px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .password-strength-bar {
-            height: 100%;
-            width: 0%;
-            border-radius: 3px;
-            transition: all 0.3s;
-        }
-
         .btn {
             width: 100%;
             padding: 14px;
@@ -256,8 +184,6 @@
             cursor: pointer;
             transition: all 0.3s;
             margin-top: 8px;
-            position: relative;
-            overflow: hidden;
         }
 
         .btn:hover {
@@ -308,10 +234,7 @@
             background: rgba(255,255,255,0.08);
         }
 
-        .divider span {
-            font-size: 12px;
-            color: rgba(255,255,255,0.3);
-        }
+        .divider span { font-size: 12px; color: rgba(255,255,255,0.3); }
 
         .login-link {
             text-align: center;
@@ -325,33 +248,11 @@
             font-weight: 600;
         }
 
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2.5px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
         .footer {
             text-align: center;
             margin-top: 18px;
             color: rgba(255,255,255,0.18);
             font-size: 11px;
-        }
-
-        .terms-note {
-            font-size: 11px;
-            color: rgba(255,255,255,0.3);
-            text-align: center;
-            margin-top: 12px;
-            line-height: 1.5;
         }
 
         @media (max-width: 480px) {
@@ -371,23 +272,6 @@
         <div class="card">
             <div class="card-title">Buat Akun Baru ✨</div>
             <div class="card-subtitle">Isi data diri kamu untuk mendaftar</div>
-
-            <div class="steps">
-                <div class="step active">
-                    <div class="step-circle">1</div>
-                    <div class="step-label">Data Diri</div>
-                </div>
-                <div class="step-line"></div>
-                <div class="step">
-                    <div class="step-circle">2</div>
-                    <div class="step-label">Verifikasi</div>
-                </div>
-                <div class="step-line"></div>
-                <div class="step">
-                    <div class="step-circle">3</div>
-                    <div class="step-label">Aktif</div>
-                </div>
-            </div>
 
             <form id="registerForm">
                 <div class="form-grid">
@@ -427,10 +311,7 @@
                         <label for="password">Password</label>
                         <div class="input-wrapper">
                             <span class="input-icon">🔑</span>
-                            <input type="password" id="password" name="password" required placeholder="Min. 6 karakter" oninput="checkStrength(this.value)">
-                        </div>
-                        <div class="password-strength">
-                            <div class="password-strength-bar" id="strengthBar"></div>
+                            <input type="password" id="password" name="password" required placeholder="Min. 6 karakter">
                         </div>
                     </div>
 
@@ -450,10 +331,6 @@
 
             <div class="message" id="message"></div>
 
-            <div class="terms-note">
-                Dengan mendaftar, kamu menyetujui syarat & ketentuan penggunaan Triple M Hotspot.
-            </div>
-
             <div class="divider"><span>atau</span></div>
 
             <div class="login-link">
@@ -465,28 +342,13 @@
     </div>
 
     <script>
-        // Dipatenkan langsung ke Vercel
+        // DI-HARDCODE KONSISTEN KE HTTPS VERCEL
         const BACKEND_URL = 'https://3m-r3if.vercel.app';
-        
+
         const form = document.getElementById('registerForm');
         const submitBtn = document.getElementById('submitBtn');
         const btnText = document.getElementById('btnText');
         const message = document.getElementById('message');
-
-        function checkStrength(value) {
-            const bar = document.getElementById('strengthBar');
-            let strength = 0;
-            if (value.length >= 6) strength++;
-            if (value.length >= 10) strength++;
-            if (/[A-Z]/.test(value)) strength++;
-            if (/[0-9]/.test(value)) strength++;
-            if (/[^A-Za-z0-9]/.test(value)) strength++;
-
-            const colors = ['#ff5252', '#ff5252', '#ffc107', '#00b0ff', '#00e676'];
-            const widths = ['20%', '40%', '60%', '80%', '100%'];
-            bar.style.width = value.length > 0 ? widths[Math.min(strength - 1, 4)] : '0%';
-            bar.style.background = value.length > 0 ? colors[Math.min(strength - 1, 4)] : 'transparent';
-        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -508,31 +370,28 @@
             };
 
             submitBtn.disabled = true;
-            btnText.innerHTML = '<span class="loading"></span> Memproses...';
+            btnText.textContent = 'Memproses...';
 
             try {
                 const response = await fetch(`${BACKEND_URL}/api/register`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
 
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    showMessage(data.message || 'Registrasi berhasil! Mengalihkan...', 'success');
+                    showMessage(data.message || 'Registrasi berhasil! Mengalihkan ke halaman login...', 'success');
                     form.reset();
-
                     setTimeout(() => {
                         window.location.href = 'login.html';
                     }, 2000);
                 } else {
-                    showMessage(data.message || 'Gagal mendaftar. Silakan coba lagi.', 'error');
+                    showMessage(data.message || 'Gagal mendaftar.', 'error');
                 }
             } catch (error) {
-                showMessage('Gagal terhubung ke server backend Vercel.', 'error');
+                showMessage('Terjadi kesalahan koneksi ke server backend.', 'error');
             } finally {
                 submitBtn.disabled = false;
                 btnText.textContent = 'Daftar Sekarang';
@@ -543,10 +402,7 @@
             message.textContent = text;
             message.className = `message ${type}`;
             message.style.display = 'block';
-
-            setTimeout(() => {
-                message.style.display = 'none';
-            }, 5000);
+            setTimeout(() => { message.style.display = 'none'; }, 5000);
         }
     </script>
 </body>
