@@ -10,7 +10,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 1. Endpoint Register User Baru
+// 1. Endpoint Login Admin Panel
+app.post('/api/admin/login', (req, res) => {
+  const { password } = req.body;
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+
+  if (password === adminPassword) {
+    return res.json({ success: true, message: 'Login admin berhasil' });
+  } else {
+    return res.status(401).json({ success: false, message: 'Password admin salah' });
+  }
+});
+
+// 2. Endpoint Register User Baru
 app.post('/api/register', async (req, res) => {
   try {
     const { username, password, fullName, phone, email } = req.body;
@@ -34,7 +46,6 @@ app.post('/api/register', async (req, res) => {
       createdAt: new Date().toISOString()
     };
 
-    // Menggunakan addUser (sesuai method di storage.js)
     await storageConfig.addUser(newUser);
 
     res.json({ success: true, message: 'Pendaftaran berhasil, menunggu persetujuan admin' });
@@ -44,7 +55,7 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// 2. Endpoint Login User (Cek status pending/approved)
+// 3. Endpoint Login User Hotspot
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -65,7 +76,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// 3. Endpoint Approve User (Admin Only)
+// 4. Endpoint Approve User (Admin Only)
 app.post('/api/approve', async (req, res) => {
   try {
     const { username, adminName } = req.body;
@@ -74,16 +85,13 @@ app.post('/api/approve', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Username is required' });
     }
     
-    // Update status di storage / Redis
     await storageConfig.approveUser(username, adminName || 'Admin');
     
-    // Ambil data password user dari storage
     const userData = await storageConfig.getUserByUsername(username);
     if (!userData) {
       return res.status(404).json({ success: false, message: 'User data not found in storage' });
     }
 
-    // Tambahkan ke MikroTik Hotspot via API (Port 3111 Tunnel.id)
     if (mikrotikConfig.addUserToHotspot && typeof mikrotikConfig.addUserToHotspot === 'function') {
       const result = await mikrotikConfig.addUserToHotspot(userData.username, userData.password);
       if (!result.success) {
@@ -98,7 +106,7 @@ app.post('/api/approve', async (req, res) => {
   }
 });
 
-// 4. Endpoint Ambil Daftar Semua User (Admin Only)
+// 5. Endpoint Ambil Semua User (Admin Only)
 app.get('/api/users', async (req, res) => {
   try {
     const users = await storageConfig.getAllUsers();
@@ -109,7 +117,7 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-// 5. Endpoint Ambil Statistik Traffic / Online MikroTik (Admin Only)
+// 6. Endpoint Ambil Statistik Traffic / Online MikroTik
 app.get('/api/mikrotik/stats', async (req, res) => {
   try {
     if (mikrotikConfig.getUsersStats && typeof mikrotikConfig.getUsersStats === 'function') {
@@ -123,7 +131,7 @@ app.get('/api/mikrotik/stats', async (req, res) => {
   }
 });
 
-// Serve Admin Panel & Pages
+// Routing Halaman Admin & Catch-all
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
