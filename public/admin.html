@@ -3,7 +3,7 @@
 <head>
   <!-- ====================================================================
        JUDUL: DASHBOARD FRONTEND TERBARU + GRAFIK TRAFIK REALTIME
-       NAMA FILE: index.html
+       NAMA FILE: admin.html
        ==================================================================== -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -301,10 +301,10 @@
        BAGIAN 4: LOGIKA JAVASCRIPT FRONTEND
        -------------------------------------------------------------------- -->
   <script>
-    // Konfigurasi URL Backend (Menggunakan localhost saat pengembangan)
+    // URL Backend Otomatis Menggunakan Domain Vercel Kamu
     const BACKEND_URL = window.location.hostname === 'localhost' 
       ? 'http://localhost:5000' 
-      : 'https://nama-proyek-kamu.vercel.app';
+      : 'https://3m-r3if.vercel.app';
 
     let token = localStorage.getItem('adminToken');
     let socket;
