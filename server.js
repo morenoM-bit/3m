@@ -1,28 +1,22 @@
 /* ==========================================================================
    JUDUL: SERVER BACKEND (EXPRESS.JS & SOCKET.IO)
    NAMA FILE: server.js
-   DESKRIPSI: Server backend untuk menangani API Admin & Trafik Realtime
    ========================================================================== */
 
-// --------------------------------------------------------------------------
-// BAGIAN 1: IMPORT LIBRARY / MODUL YANG DIBUTUHKAN
-// --------------------------------------------------------------------------
 const express = require('express');
 const http = require('http');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const { Server } = require('socket.io');
+const path = require('path');
 
-// --------------------------------------------------------------------------
-// BAGIAN 2: INISIALISASI APLIKASI DAN KONFIGURASI SERVER
-// --------------------------------------------------------------------------
 const app = express();
 const server = http.createServer(app);
 
-// Konfigurasi WebSocket (Socket.io) untuk komunikasi realtime dengan frontend
+// Konfigurasi WebSocket dengan dukungan polling & websocket
 const io = new Server(server, {
   cors: {
-    origin: "*", // Mengizinkan semua domain mengakses server
+    origin: "*",
     methods: ["GET", "POST"]
   }
 });
@@ -30,20 +24,22 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
-// Kunci rahasia JWT & Password Admin (Bisa diganti sesuai kebutuhan)
+// Menyajikan file statis dari folder 'public' (agar admin.html bisa dibuka langsung)
+app.use(express.static(path.join(__dirname, 'public')));
+
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_triple_m_hotspot';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
-// --------------------------------------------------------------------------
-// BAGIAN 3: DATABASE DUMMY (DATA PENGGUNA MIKROTIK/HOTSPOT)
-// --------------------------------------------------------------------------
+// Data Pengguna dengan status dan trafik individual
 let users = [
   {
     id: 1,
     username: 'user01',
-    status: 'pending', // Pilihan status: pending, active, rejected
-    download: 102450000, // Ukuran data dalam satuan Bytes
+    status: 'pending',
+    download: 102450000,
     upload: 52400000,
+    downloadSpeed: 0,
+    uploadSpeed: 0,
     created_at: new Date()
   },
   {
@@ -52,13 +48,12 @@ let users = [
     status: 'active',
     download: 512000000,
     upload: 120000000,
+    downloadSpeed: 12.5,
+    uploadSpeed: 3.2,
     created_at: new Date()
   }
 ];
 
-// --------------------------------------------------------------------------
-// BAGIAN 4: MIDDLEWARE KEAMANAN (VERIFIKASI TOKEN ADMIN)
-// --------------------------------------------------------------------------
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -69,103 +64,92 @@ function authenticateToken(req, res, next) {
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
-      return res.status(403).json({ success: false, message: 'Token tidak valid atau sudah kadaluwarsa.' });
+      return res.status(403).json({ success: false, message: 'Token tidak valid atau kadaluwarsa.' });
     }
     req.user = user;
     next();
   });
 }
 
-// --------------------------------------------------------------------------
-// BAGIAN 5: ENDPOINT API (LOGIN & MANAJEMEN USER)
-// --------------------------------------------------------------------------
-
-// 5.1. Endpoint Login Admin
+// Endpoint Login Admin
 app.post('/api/admin/login', (req, res) => {
   const { password } = req.body;
-
   if (password === ADMIN_PASSWORD) {
     const token = jwt.sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '1d' });
     return res.json({ success: true, token, message: 'Login berhasil' });
   }
-
   return res.status(401).json({ success: false, message: 'Password salah' });
 });
 
-// 5.2. Endpoint Mengambil Seluruh Data Pengguna
+// Endpoint Mengambil Data Users
 app.get('/api/users', authenticateToken, (req, res) => {
   res.json({ success: true, users });
 });
 
-// 5.3. Endpoint Menyetujui Pengguna (Approve)
+// Endpoint Approve
 app.post('/api/approve', authenticateToken, (req, res) => {
   const { username } = req.body;
   const user = users.find(u => u.username === username);
-
-  if (!user) {
-    return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan' });
-  }
+  if (!user) return res.status(404).json({ success: false, message: 'User tidak ditemukan' });
 
   user.status = 'active';
-  res.json({ success: true, message: `Pengguna ${username} telah disetujui.` });
+  res.json({ success: true, message: `Pengguna ${username} disetujui.` });
 });
 
-// 5.4. Endpoint Menolak Pengguna (Reject)
+// Endpoint Reject
 app.post('/api/reject', authenticateToken, (req, res) => {
   const { username } = req.body;
   const user = users.find(u => u.username === username);
-
-  if (!user) {
-    return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan' });
-  }
+  if (!user) return res.status(404).json({ success: false, message: 'User tidak ditemukan' });
 
   user.status = 'rejected';
+  user.downloadSpeed = 0;
+  user.uploadSpeed = 0;
   res.json({ success: true, message: `Pengguna ${username} ditolak.` });
 });
 
-// 5.5. Endpoint Menghapus Pengguna (Delete)
+// Endpoint Delete
 app.delete('/api/users/:username', authenticateToken, (req, res) => {
   const { username } = req.params;
   const initialLength = users.length;
   users = users.filter(u => u.username !== username);
 
   if (users.length === initialLength) {
-    return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan' });
+    return res.status(404).json({ success: false, message: 'User tidak ditemukan' });
   }
-
-  res.json({ success: true, message: `Pengguna ${username} berhasil dihapus.` });
+  res.json({ success: true, message: `Pengguna ${username} dihapus.` });
 });
 
-// --------------------------------------------------------------------------
-// BAGIAN 6: FITUR REALTIME TRAFFIC MONITOR (SOCKET.IO)
-// --------------------------------------------------------------------------
+// Realtime Socket.io per User
 io.on('connection', (socket) => {
-  console.log('Admin terhubung ke Realtime Monitor Socket ID:', socket.id);
+  console.log('Admin terhubung ke Socket ID:', socket.id);
 
-  // Mengirim data kecepatan trafik (Mbps) secara realtime setiap 1 detik
   const trafficInterval = setInterval(() => {
-    // Simulasi data trafik acak (Download: 5-50 Mbps, Upload: 1-20 Mbps)
-    const downloadSpeed = (Math.random() * (50 - 5) + 5).toFixed(2);
-    const uploadSpeed = (Math.random() * (20 - 1) + 1).toFixed(2);
-
-    socket.emit('trafficData', {
-      timestamp: new Date().toLocaleTimeString(),
-      downloadMbps: parseFloat(downloadSpeed),
-      uploadMbps: parseFloat(uploadSpeed)
+    // Memperbarui trafik acak hanya untuk pengguna berstatus 'active'
+    users.forEach(u => {
+      if (u.status === 'active') {
+        u.downloadSpeed = parseFloat((Math.random() * (25 - 2) + 2).toFixed(2));
+        u.uploadSpeed = parseFloat((Math.random() * (8 - 0.5) + 0.5).toFixed(2));
+        u.download += Math.floor(u.downloadSpeed * 125000);
+        u.upload += Math.floor(u.uploadSpeed * 125000);
+      } else {
+        u.downloadSpeed = 0;
+        u.uploadSpeed = 0;
+      }
     });
-  }, 1000);
 
-  // Membersihkan koneksi saat admin terputus / mereload halaman
+    socket.emit('userTrafficUpdate', {
+      timestamp: new Date().toLocaleTimeString(),
+      users: users
+    });
+  }, 2000);
+
   socket.on('disconnect', () => {
-    console.log('Admin terputus dari Realtime Monitor');
     clearInterval(trafficInterval);
   });
 });
 
-// --------------------------------------------------------------------------
-// BAGIAN 7: MENJALANKAN SERVER
-// --------------------------------------------------------------------------
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`Server Triple M Hotspot Backend berjalan di port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
