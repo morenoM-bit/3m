@@ -1,10 +1,18 @@
 const express = require('express');
+const cors = require('cors'); // 1. Tambah modul cors
 const path = require('path');
 const mikrotikConfig = require('./config/mikrotik');
 const storageConfig = require('./config/storage');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// 2. Pasang Middleware CORS di sini (Wajib paling atas sebelum router)
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
