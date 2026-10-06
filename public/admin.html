@@ -1,24 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <!-- ====================================================================
-       JUDUL: DASHBOARD FRONTEND TERBARU + GRAFIK TRAFIK REALTIME
-       NAMA FILE: admin.html
-       ==================================================================== -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Panel - Triple M Hotspot</title>
   
-  <!-- Font Poppins -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Pustaka Socket.io & Chart.js untuk Grafik Realtime -->
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- --------------------------------------------------------------------
-       BAGIAN 1: DESAIN CSS / TAMPILAN
-       -------------------------------------------------------------------- -->
   <style>
     :root {
       --bg-color: #0f172a;
@@ -32,198 +22,44 @@
       --border: #334155;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Poppins', sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
 
-    body {
-      background-color: var(--bg-color);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+    .login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); display: flex; justify-content: center; align-items: center; z-index: 100; }
+    .login-box { background: var(--card-bg); padding: 2.5rem; border-radius: 1rem; border: 1px solid var(--border); width: 100%; max-width: 400px; }
+    .login-box h2 { margin-bottom: 1.5rem; text-align: center; color: var(--accent); }
+    .input-group { margin-bottom: 1.2rem; }
+    .input-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-dim); }
+    .input-group input, select { width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border); background: #0f172a; color: var(--text); outline: none; }
 
-    /* Modal Login */
-    .login-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(15, 23, 42, 0.95);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-    }
+    .btn { width: 100%; padding: 0.75rem; border: none; border-radius: 0.5rem; background: var(--accent); color: white; font-weight: 600; cursor: pointer; }
+    .btn:hover { background: var(--accent-hover); }
 
-    .login-box {
-      background: var(--card-bg);
-      padding: 2.5rem;
-      border-radius: 1rem;
-      border: 1px solid var(--border);
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    }
+    .dashboard { display: none; padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
 
-    .login-box h2 {
-      margin-bottom: 1.5rem;
-      text-align: center;
-      color: var(--accent);
-    }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .stat-card { background: var(--card-bg); padding: 1.5rem; border-radius: 0.75rem; border: 1px solid var(--border); }
+    .stat-card h3 { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.5rem; }
+    .stat-card .value { font-size: 1.8rem; font-weight: 700; }
 
-    .input-group {
-      margin-bottom: 1.2rem;
-    }
+    .chart-box { background: var(--card-bg); padding: 1.5rem; border-radius: 0.75rem; border: 1px solid var(--border); margin-bottom: 2rem; }
+    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .chart-header h3 { font-size: 1rem; color: var(--accent); }
+    .chart-header select { width: auto; min-width: 180px; }
+    .chart-container { position: relative; height: 300px; width: 100%; }
 
-    .input-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
-      color: var(--text-dim);
-    }
+    .table-container { background: var(--card-bg); border-radius: 0.75rem; border: 1px solid var(--border); overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 1rem; border-bottom: 1px solid var(--border); }
+    th { background: rgba(255,255,255,0.02); font-size: 0.85rem; color: var(--text-dim); }
 
-    .input-group input {
-      width: 100%;
-      padding: 0.75rem;
-      border-radius: 0.5rem;
-      border: 1px solid var(--border);
-      background: #0f172a;
-      color: var(--text);
-      outline: none;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 0.75rem;
-      border: none;
-      border-radius: 0.5rem;
-      background: var(--accent);
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .btn:hover {
-      background: var(--accent-hover);
-    }
-
-    /* Layout Dashboard */
-    .dashboard {
-      display: none;
-      padding: 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    /* Kartu Statistik Ringkasan */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .stat-card {
-      background: var(--card-bg);
-      padding: 1.5rem;
-      border-radius: 0.75rem;
-      border: 1px solid var(--border);
-    }
-
-    .stat-card h3 {
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      margin-bottom: 0.5rem;
-    }
-
-    .stat-card .value {
-      font-size: 1.8rem;
-      font-weight: 700;
-    }
-
-    /* Wadah Grafik Realtime Traffic */
-    .chart-box {
-      background: var(--card-bg);
-      padding: 1.5rem;
-      border-radius: 0.75rem;
-      border: 1px solid var(--border);
-      margin-bottom: 2rem;
-    }
-
-    .chart-box h3 {
-      font-size: 1rem;
-      margin-bottom: 1rem;
-      color: var(--accent);
-    }
-
-    .chart-container {
-      position: relative;
-      height: 300px;
-      width: 100%;
-    }
-
-    /* Tabel User */
-    .table-container {
-      background: var(--card-bg);
-      border-radius: 0.75rem;
-      border: 1px solid var(--border);
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-    }
-
-    th, td {
-      padding: 1rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    th {
-      background: rgba(255,255,255,0.02);
-      font-size: 0.85rem;
-      color: var(--text-dim);
-    }
-
-    .badge {
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.25rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
+    .badge { padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; }
     .badge-pending { background: rgba(234, 179, 8, 0.2); color: #fde047; }
     .badge-active { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
     .badge-rejected { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
 
-    .action-btn {
-      padding: 0.4rem 0.8rem;
-      border-radius: 0.35rem;
-      border: none;
-      font-size: 0.8rem;
-      cursor: pointer;
-      margin-right: 0.3rem;
-    }
-
+    .action-btn { padding: 0.4rem 0.8rem; border-radius: 0.35rem; border: none; font-size: 0.8rem; cursor: pointer; margin-right: 0.3rem; }
     .btn-approve { background: var(--success); color: white; }
     .btn-reject { background: var(--danger); color: white; }
     .btn-delete { background: var(--border); color: var(--text); }
@@ -231,9 +67,6 @@
 </head>
 <body>
 
-  <!-- --------------------------------------------------------------------
-       BAGIAN 2: MODAL LOGIN ADMIN
-       -------------------------------------------------------------------- -->
   <div class="login-modal" id="loginModal">
     <div class="login-box">
       <h2>Admin Login</h2>
@@ -245,16 +78,12 @@
     </div>
   </div>
 
-  <!-- --------------------------------------------------------------------
-       BAGIAN 3: DASHBOARD UTAMA
-       -------------------------------------------------------------------- -->
   <div class="dashboard" id="dashboard">
     <header>
       <h1>Triple M Hotspot</h1>
       <button class="action-btn btn-reject" onclick="logout()">Keluar</button>
     </header>
 
-    <!-- Kartu Ringkasan User -->
     <div class="stats-grid">
       <div class="stat-card">
         <h3>TOTAL PENGGUNA</h3>
@@ -270,51 +99,48 @@
       </div>
     </div>
 
-    <!-- Grafik Realtime Traffic (Download & Upload) -->
     <div class="chart-box">
-      <h3>Monitor Traffic Realtime (Mbps)</h3>
+      <div class="chart-header">
+        <h3>Monitor Trafik Realtime Pengguna</h3>
+        <select id="userSelect" onchange="changeMonitoredUser()">
+          <option value="">-- Pilih Pengguna --</option>
+        </select>
+      </div>
       <div class="chart-container">
         <canvas id="trafficChart"></canvas>
       </div>
     </div>
 
-    <!-- Tabel Daftar Pengguna Hotspot -->
     <div class="table-container">
       <table>
         <thead>
           <tr>
             <th>Username</th>
             <th>Status</th>
-            <th>Download</th>
-            <th>Upload</th>
+            <th>Speed (DL / UL)</th>
+            <th>Total Download</th>
+            <th>Total Upload</th>
             <th>Aksi</th>
           </tr>
         </thead>
-        <tbody id="userTableBody">
-          <!-- Data diisi secara dinamis oleh JavaScript -->
-        </tbody>
+        <tbody id="userTableBody"></tbody>
       </table>
     </div>
   </div>
 
-  <!-- --------------------------------------------------------------------
-       BAGIAN 4: LOGIKA JAVASCRIPT FRONTEND
-       -------------------------------------------------------------------- -->
   <script>
-    // URL Backend Otomatis Menggunakan Domain Vercel Kamu
     const BACKEND_URL = window.location.hostname === 'localhost' 
       ? 'http://localhost:5000' 
-      : 'https://3m-r3if.vercel.app';
+      : window.location.origin;
 
     let token = localStorage.getItem('adminToken');
     let socket;
     let trafficChart;
+    let selectedUser = '';
+    let currentUsersData = [];
 
-    if (token) {
-      showDashboard();
-    }
+    if (token) showDashboard();
 
-    // 4.1. Fungsi Login Admin
     async function login() {
       const password = document.getElementById('adminPassword').value;
       try {
@@ -332,27 +158,23 @@
           alert(data.message || 'Login gagal');
         }
       } catch (err) {
-        alert('Gagal terhubung ke server backend');
+        alert('Gagal terhubung ke server');
       }
     }
 
-    // 4.2. Fungsi Logout
     function logout() {
       localStorage.removeItem('adminToken');
       location.reload();
     }
 
-    // 4.3. Menampilkan Dashboard setelah Login Sukses
     function showDashboard() {
       document.getElementById('loginModal').style.display = 'none';
       document.getElementById('dashboard').style.display = 'block';
       loadUsers();
-      initTrafficChart(); // Inisialisasi Grafik Realtime
-      initSocketConnection(); // Hubungkan ke WebSocket Backend
-      setInterval(loadUsers, 30000); // Auto-refresh data user setiap 30 detik
+      initTrafficChart();
+      initSocketConnection();
     }
 
-    // 4.4. Memuat Data User dari Backend API
     async function loadUsers() {
       try {
         const res = await fetch(`${BACKEND_URL}/api/users`, {
@@ -360,15 +182,46 @@
         });
         const data = await res.json();
         if (data.success) {
+          currentUsersData = data.users;
           renderTable(data.users);
           updateStats(data.users);
+          updateUserSelectOptions(data.users);
         }
       } catch (err) {
-        console.error('Gagal memuat data pengguna:', err);
+        console.error('Gagal memuat pengguna:', err);
       }
     }
 
-    // 4.5. Menampilkan Data Pengguna ke Tabel
+    function updateUserSelectOptions(users) {
+      const select = document.getElementById('userSelect');
+      const activeUsers = users.filter(u => u.status === 'active');
+      
+      const currentVal = select.value;
+      select.innerHTML = '<option value="">-- Pilih Pengguna --</option>';
+      
+      activeUsers.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.username;
+        opt.textContent = `${u.username} (Aktif)`;
+        select.appendChild(opt);
+      });
+
+      if (currentVal && activeUsers.some(u => u.username === currentVal)) {
+        select.value = currentVal;
+      } else if (activeUsers.length > 0) {
+        select.value = activeUsers[0].username;
+        selectedUser = activeUsers[0].username;
+      }
+    }
+
+    function changeMonitoredUser() {
+      selectedUser = document.getElementById('userSelect').value;
+      trafficChart.data.labels = [];
+      trafficChart.data.datasets[0].data = [];
+      trafficChart.data.datasets[1].data = [];
+      trafficChart.update();
+    }
+
     function renderTable(users) {
       const tbody = document.getElementById('userTableBody');
       tbody.innerHTML = '';
@@ -376,8 +229,9 @@
       users.forEach(u => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${u.username}</td>
+          <td><b>${u.username}</b></td>
           <td><span class="badge badge-${u.status}">${u.status}</span></td>
+          <td>${u.downloadSpeed || 0} / ${u.uploadSpeed || 0} Mbps</td>
           <td>${formatBytes(u.download || 0)}</td>
           <td>${formatBytes(u.upload || 0)}</td>
           <td>
@@ -390,14 +244,12 @@
       });
     }
 
-    // 4.6. Mengupdate Kartu Statistik
     function updateStats(users) {
       document.getElementById('totalUsers').innerText = users.length;
       document.getElementById('pendingUsers').innerText = users.filter(u => u.status === 'pending').length;
       document.getElementById('activeUsers').innerText = users.filter(u => u.status === 'active').length;
     }
 
-    // 4.7. Fungsi Aksi User (Approve, Reject, Delete)
     async function approveUser(username) {
       await fetch(`${BACKEND_URL}/api/approve`, {
         method: 'POST',
@@ -426,7 +278,6 @@
       }
     }
 
-    // 4.8. Mengubah Format Byte ke KB, MB, GB
     function formatBytes(bytes) {
       if (bytes === 0) return '0 B';
       const k = 1024;
@@ -435,9 +286,6 @@
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
-    // --------------------------------------------------------------------
-    // 4.9. INISIALISASI GRAFIK REALTIME (CHART.JS)
-    // --------------------------------------------------------------------
     function initTrafficChart() {
       const ctx = document.getElementById('trafficChart').getContext('2d');
       trafficChart = new Chart(ctx, {
@@ -447,7 +295,7 @@
           datasets: [
             {
               label: 'Download (Mbps)',
-              borderColor: '#10b981', // Warna Hijau
+              borderColor: '#10b981',
               backgroundColor: 'rgba(16, 185, 129, 0.1)',
               data: [],
               fill: true,
@@ -455,7 +303,7 @@
             },
             {
               label: 'Upload (Mbps)',
-              borderColor: '#3b82f6', // Warna Biru
+              borderColor: '#3b82f6',
               backgroundColor: 'rgba(59, 130, 246, 0.1)',
               data: [],
               fill: true,
@@ -474,26 +322,30 @@
       });
     }
 
-    // --------------------------------------------------------------------
-    // 4.10. KONEKSI SOCKET.IO UNTUK UPDATE GRAFIK REALTIME
-    // --------------------------------------------------------------------
     function initSocketConnection() {
-      socket = io(BACKEND_URL);
+      socket = io(BACKEND_URL, { transports: ['polling', 'websocket'] });
 
-      socket.on('trafficData', (data) => {
-        const maxDataPoints = 15; // Jumlah titik waktu yang terlihat di grafik
+      socket.on('userTrafficUpdate', (data) => {
+        renderTable(data.users);
+        updateStats(data.users);
+        updateUserSelectOptions(data.users);
 
-        if (trafficChart.data.labels.length >= maxDataPoints) {
-          trafficChart.data.labels.shift();
-          trafficChart.data.datasets[0].data.shift();
-          trafficChart.data.datasets[1].data.shift();
+        if (!selectedUser) return;
+
+        const targetUser = data.users.find(u => u.username === selectedUser);
+        if (targetUser) {
+          const maxPoints = 15;
+          if (trafficChart.data.labels.length >= maxPoints) {
+            trafficChart.data.labels.shift();
+            trafficChart.data.datasets[0].data.shift();
+            trafficChart.data.datasets[1].data.shift();
+          }
+
+          trafficChart.data.labels.push(data.timestamp);
+          trafficChart.data.datasets[0].data.push(targetUser.downloadSpeed);
+          trafficChart.data.datasets[1].data.push(targetUser.uploadSpeed);
+          trafficChart.update();
         }
-
-        trafficChart.data.labels.push(data.timestamp);
-        trafficChart.data.datasets[0].data.push(data.downloadMbps);
-        trafficChart.data.datasets[1].data.push(data.uploadMbps);
-
-        trafficChart.update();
       });
     }
   </script>
