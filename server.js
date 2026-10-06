@@ -125,29 +125,22 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-// 6. Endpoint Ambil Statistik Traffic / Online MikroTik
-app.get('/api/mikrotik/stats', async (req, res) => {
+// 5b. ENDPOINT KHUSUS CEK STATUS USER (DIBAWAH INI YANG DITAMBAHKAN)
+app.get('/api/users/:username', async (req, res) => {
   try {
-    if (mikrotikConfig.getUsersStats && typeof mikrotikConfig.getUsersStats === 'function') {
-      const stats = await mikrotikConfig.getUsersStats();
-      return res.json({ success: true, stats });
+    const { username } = req.params;
+    const user = await storageConfig.getUserByUsername(username);
+
+    if (user) {
+      return res.json({ 
+        success: true, 
+        user: { 
+          username: user.username, 
+          status: user.status 
+        } 
+      });
+    } else {
+      return res.status(404).json({ success: false, message: 'User tidak ditemukan' });
     }
-    res.json({ success: true, stats: [] });
   } catch (error) {
-    console.error('Mikrotik stats error:', error);
-    res.status(500).json({ success: false, message: 'Gagal mengambil statistik MikroTik' });
-  }
-});
-
-// Routing Halaman Admin & Catch-all
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-});
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+    console.error('Cek status error:',
