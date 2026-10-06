@@ -1,6 +1,6 @@
 /* ==========================================================================
-   JUDUL: SERVER BACKEND (EXPRESS.JS & SOCKET.IO)
-   NAMA FILE: server.js
+   SERVER BACKEND - DENGAN FITUR REGISTRASI USER
+   File: server.js
    ========================================================================== */
 
 const express = require('express');
@@ -27,49 +27,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_triple_m_hotspot';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
-// Data Pengguna dengan Nama Realistis
-let users = [
-  {
-    id: 1,
-    username: 'Budi_Santoso',
-    status: 'pending',
-    download: 102450000,
-    upload: 52400000,
-    downloadSpeed: 0,
-    uploadSpeed: 0,
-    created_at: new Date()
-  },
-  {
-    id: 2,
-    username: 'Rizky_Gamer',
-    status: 'active',
-    download: 512000000,
-    upload: 120000000,
-    downloadSpeed: 14.2,
-    uploadSpeed: 3.5,
-    created_at: new Date()
-  },
-  {
-    id: 3,
-    username: 'Siti_Office',
-    status: 'active',
-    download: 240000000,
-    upload: 85000000,
-    downloadSpeed: 5.8,
-    uploadSpeed: 1.2,
-    created_at: new Date()
-  },
-  {
-    id: 4,
-    username: 'Moreno_VIP',
-    status: 'active',
-    download: 890000000,
-    upload: 310000000,
-    downloadSpeed: 28.4,
-    uploadSpeed: 8.7,
-    created_at: new Date()
-  }
-];
+// Array penampung user hasil registrasi
+let users = [];
 
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
@@ -88,7 +47,54 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// Endpoint Login Admin
+// -------------------------------------------------------------
+// ENDPOINT REGISTRASI USER BARU
+// -------------------------------------------------------------
+app.post('/api/register', (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !username.trim()) {
+    return res.status(400).json({ success: false, message: 'Username tidak boleh kosong!' });
+  }
+
+  const cleanUsername = username.trim();
+
+  // Cek duplikasi username
+  const isExist = users.some(u => u.username.toLowerCase() === cleanUsername.toLowerCase());
+  if (isExist) {
+    return res.status(400).json({ success: false, message: 'Username sudah terdaftar!' });
+  }
+
+  const newUser = {
+    id: Date.now(),
+    username: cleanUsername,
+    password: password || '',
+    status: 'pending', // Status awal masuk ke antrean admin
+    download: 0,
+    upload: 0,
+    downloadSpeed: 0,
+    uploadSpeed: 0,
+    created_at: new Date()
+  };
+
+  users.push(newUser);
+
+  // Broadcast pembaruan langsung ke admin via WebSocket jika online
+  io.emit('userTrafficUpdate', {
+    timestamp: new Date().toLocaleTimeString(),
+    users: users
+  });
+
+  return res.json({
+    success: true,
+    message: 'Registrasi berhasil! Menunggu persetujuan admin.',
+    user: newUser
+  });
+});
+
+// -------------------------------------------------------------
+// ENDPOINT ADMIN
+// -------------------------------------------------------------
 app.post('/api/admin/login', (req, res) => {
   const { password } = req.body;
   if (password === ADMIN_PASSWORD) {
@@ -98,12 +104,10 @@ app.post('/api/admin/login', (req, res) => {
   return res.status(401).json({ success: false, message: 'Password salah' });
 });
 
-// Endpoint Ambil Users
 app.get('/api/users', authenticateToken, (req, res) => {
   res.json({ success: true, users });
 });
 
-// Endpoint Approve
 app.post('/api/approve', authenticateToken, (req, res) => {
   const { username } = req.body;
   const user = users.find(u => u.username === username);
@@ -113,7 +117,6 @@ app.post('/api/approve', authenticateToken, (req, res) => {
   res.json({ success: true, message: `Pengguna ${username} disetujui.` });
 });
 
-// Endpoint Reject
 app.post('/api/reject', authenticateToken, (req, res) => {
   const { username } = req.body;
   const user = users.find(u => u.username === username);
@@ -125,7 +128,6 @@ app.post('/api/reject', authenticateToken, (req, res) => {
   res.json({ success: true, message: `Pengguna ${username} ditolak.` });
 });
 
-// Endpoint Delete
 app.delete('/api/users/:username', authenticateToken, (req, res) => {
   const { username } = req.params;
   const initialLength = users.length;
@@ -137,7 +139,7 @@ app.delete('/api/users/:username', authenticateToken, (req, res) => {
   res.json({ success: true, message: `Pengguna ${username} dihapus.` });
 });
 
-// Realtime Socket.io per User
+// Socket.io Realtime Update
 io.on('connection', (socket) => {
   const trafficInterval = setInterval(() => {
     users.forEach(u => {
