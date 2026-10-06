@@ -13,7 +13,6 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 
-// Konfigurasi WebSocket dengan dukungan polling & websocket
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -23,18 +22,16 @@ const io = new Server(server, {
 
 app.use(cors());
 app.use(express.json());
-
-// Menyajikan file statis dari folder 'public' (agar admin.html bisa dibuka langsung)
 app.use(express.static(path.join(__dirname, 'public')));
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_triple_m_hotspot';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
-// Data Pengguna dengan status dan trafik individual
+// Data Pengguna dengan Nama Realistis
 let users = [
   {
     id: 1,
-    username: 'user01',
+    username: 'Budi_Santoso',
     status: 'pending',
     download: 102450000,
     upload: 52400000,
@@ -44,12 +41,32 @@ let users = [
   },
   {
     id: 2,
-    username: 'user02',
+    username: 'Rizky_Gamer',
     status: 'active',
     download: 512000000,
     upload: 120000000,
-    downloadSpeed: 12.5,
-    uploadSpeed: 3.2,
+    downloadSpeed: 14.2,
+    uploadSpeed: 3.5,
+    created_at: new Date()
+  },
+  {
+    id: 3,
+    username: 'Siti_Office',
+    status: 'active',
+    download: 240000000,
+    upload: 85000000,
+    downloadSpeed: 5.8,
+    uploadSpeed: 1.2,
+    created_at: new Date()
+  },
+  {
+    id: 4,
+    username: 'Moreno_VIP',
+    status: 'active',
+    download: 890000000,
+    upload: 310000000,
+    downloadSpeed: 28.4,
+    uploadSpeed: 8.7,
     created_at: new Date()
   }
 ];
@@ -64,7 +81,7 @@ function authenticateToken(req, res, next) {
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
-      return res.status(403).json({ success: false, message: 'Token tidak valid atau kadaluwarsa.' });
+      return res.status(403).json({ success: false, message: 'Token tidak valid.' });
     }
     req.user = user;
     next();
@@ -81,7 +98,7 @@ app.post('/api/admin/login', (req, res) => {
   return res.status(401).json({ success: false, message: 'Password salah' });
 });
 
-// Endpoint Mengambil Data Users
+// Endpoint Ambil Users
 app.get('/api/users', authenticateToken, (req, res) => {
   res.json({ success: true, users });
 });
@@ -122,14 +139,11 @@ app.delete('/api/users/:username', authenticateToken, (req, res) => {
 
 // Realtime Socket.io per User
 io.on('connection', (socket) => {
-  console.log('Admin terhubung ke Socket ID:', socket.id);
-
   const trafficInterval = setInterval(() => {
-    // Memperbarui trafik acak hanya untuk pengguna berstatus 'active'
     users.forEach(u => {
       if (u.status === 'active') {
-        u.downloadSpeed = parseFloat((Math.random() * (25 - 2) + 2).toFixed(2));
-        u.uploadSpeed = parseFloat((Math.random() * (8 - 0.5) + 0.5).toFixed(2));
+        u.downloadSpeed = parseFloat((Math.random() * (35 - 2) + 2).toFixed(2));
+        u.uploadSpeed = parseFloat((Math.random() * (12 - 0.5) + 0.5).toFixed(2));
         u.download += Math.floor(u.downloadSpeed * 125000);
         u.upload += Math.floor(u.uploadSpeed * 125000);
       } else {
@@ -142,7 +156,7 @@ io.on('connection', (socket) => {
       timestamp: new Date().toLocaleTimeString(),
       users: users
     });
-  }, 2000);
+  }, 1000);
 
   socket.on('disconnect', () => {
     clearInterval(trafficInterval);
@@ -151,5 +165,5 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server Triple M Hotspot berjalan di port ${PORT}`);
 });
