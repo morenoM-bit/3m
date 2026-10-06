@@ -34,7 +34,8 @@ app.post('/api/register', async (req, res) => {
       createdAt: new Date().toISOString()
     };
 
-    await storageConfig.saveUser(newUser);
+    // Menggunakan addUser (sesuai method di storage.js)
+    await storageConfig.addUser(newUser);
 
     res.json({ success: true, message: 'Pendaftaran berhasil, menunggu persetujuan admin' });
   } catch (error) {
