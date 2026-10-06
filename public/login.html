@@ -3,367 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Hotspot</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Triple M Hotspot - Login</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #0a0e1a;
             min-height: 100vh;
             display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 30% 40%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 70%, rgba(0, 122, 255, 0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 10% 80%, rgba(120, 0, 255, 0.05) 0%, transparent 50%);
+            animation: bgMove 8s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes bgMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(2%, 2%); }
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(0, 212, 255, 0.12) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .brand-logo {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            padding: 20px;
+            width: 62px;
+            height: 62px;
+            background: linear-gradient(135deg, #00d4ff, #007aff);
+            border-radius: 18px;
+            font-size: 28px;
+            margin-bottom: 12px;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+            animation: pulse 2.5s ease-in-out infinite;
         }
 
-        .login-card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(16px);
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(0, 212, 255, 0.4); }
+            50% { box-shadow: 0 0 50px rgba(0, 212, 255, 0.7); }
+        }
+
+        .brand-name {
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1px;
+        }
+
+        .brand-name span { color: #00d4ff; }
+
+        .brand-tagline {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 4px;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 24px;
-            padding: 32px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            padding: 36px 32px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-
-        .header h1 {
-            color: #ffffff;
-            font-size: 24px;
+        .card-title {
+            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 8px;
+            color: #fff;
+            margin-bottom: 4px;
         }
 
-        .header p {
-            color: #94a3b8;
-            font-size: 14px;
+        .card-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 24px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .form-group label {
             display: block;
-            color: #cbd5e1;
-            font-size: 13px;
+            margin-bottom: 7px;
+            color: rgba(255, 255, 255, 0.7);
             font-weight: 500;
-            margin-bottom: 8px;
+            font-size: 12px;
+            letter-spacing: 0.3px;
         }
 
-        .input-field {
+        .input-wrapper { position: relative; }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 15px;
+            pointer-events: none;
+            opacity: 0.55;
+        }
+
+        .form-group input {
             width: 100%;
-            padding: 14px 16px;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 13px 14px 13px 40px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            color: #ffffff;
             font-size: 14px;
-            outline: none;
-            transition: all 0.3s ease;
+            font-family: inherit;
+            color: #fff;
+            transition: all 0.3s;
         }
 
-        .input-field:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        .form-group input::placeholder { color: rgba(255, 255, 255, 0.28); }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.07);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.12);
         }
 
         .btn {
             width: 100%;
             padding: 14px;
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #00d4ff 0%, #007aff 100%);
+            color: white;
             border: none;
             border-radius: 12px;
-            color: #ffffff;
             font-size: 15px;
             font-weight: 600;
+            font-family: inherit;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
+            margin-top: 10px;
         }
 
         .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 122, 255, 0.45);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #cbd5e1;
+            display: block;
+            text-align: center;
+            width: 100%;
+            padding: 13px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #00d4ff;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
             margin-top: 12px;
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 212, 255, 0.12);
+            border-color: #00d4ff;
         }
 
-        .message {
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 13px;
-            margin-bottom: 20px;
-            display: none;
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .divider span {
+            font-size: 12px;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .footer {
             text-align: center;
-        }
-
-        .message.error {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #fca5a5;
-        }
-
-        .message.success {
-            background: rgba(34, 197, 94, 0.15);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            color: #86efac;
-        }
-
-        .message.info {
-            background: rgba(59, 130, 246, 0.15);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            color: #93c5fd;
-        }
-
-        .status-box {
-            display: none;
             margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255,255,255,0.18);
+            font-size: 11px;
         }
 
-        .status-box.show {
-            display: block;
-        }
-
-        .status-result {
-            margin-top: 12px;
-            font-size: 13px;
-            text-align: center;
+        /* Error Message Alert */
+        .alert-error {
+            background: rgba(255, 82, 82, 0.15);
+            border: 1px solid rgba(255, 82, 82, 0.3);
+            color: #ff5252;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-bottom: 18px;
             display: none;
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        .status-result.approved {
-            background: rgba(34, 197, 94, 0.15);
-            color: #86efac;
-        }
-
-        .status-result.pending {
-            background: rgba(234, 179, 8, 0.15);
-            color: #fde047;
-        }
-
-        .status-result.rejected, .status-result.not-found {
-            background: rgba(239, 68, 68, 0.15);
-            color: #fca5a5;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #ffffff;
-            animation: spin 0.8s linear infinite;
-            vertical-align: middle;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-
-    <div class="login-card">
-        <div class="header">
-            <h1>Selamat Datang</h1>
-            <p>Silakan masuk untuk mengakses internet</p>
+    <div class="wrapper">
+        <div class="brand">
+            <div class="brand-logo">📡</div>
+            <div class="brand-name">Triple <span>M</span> Hotspot</div>
+            <div class="brand-tagline">High Speed Internet Access</div>
         </div>
 
-        <div id="message" class="message"></div>
+        <div class="card">
+            <div class="card-title">Selamat Datang 👋</div>
+            <div class="card-subtitle">Masukkan username dan password kamu</div>
 
-        <!-- Form Tampilan Utama -->
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" class="input-field" placeholder="Masukkan username" required autocomplete="off">
+            $(if error)
+            <div class="alert-error" style="display: block;">
+                $(error)
             </div>
+            $(endif)
 
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" class="input-field" placeholder="Masukkan password" required>
-            </div>
+            <form name="login" action="$(link-login-only)" method="post">
+                <input type="hidden" name="dst" value="$(link-orig)" />
+                <input type="hidden" name="popup" value="true" />
 
-            <button type="submit" id="submitBtn" class="btn">
-                <span id="btnText">Masuk ke Jaringan</span>
-            </button>
-        </form>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🏷️</span>
+                        <input type="text" id="username" name="username" value="$(username)" required placeholder="Masukkan username">
+                    </div>
+                </div>
 
-        <button type="button" class="btn btn-secondary" onclick="toggleStatusCheck()">Cek Status Pendaftaran</button>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔑</span>
+                        <input type="password" id="password" name="password" required placeholder="Masukkan password">
+                    </div>
+                </div>
 
-        <!-- Box Cek Status -->
-        <div id="statusCheck" class="status-box">
-            <div class="form-group">
-                <label for="checkUsername">Username Pendaftaran</label>
-                <input type="text" id="checkUsername" class="input-field" placeholder="Username yang terdaftar" onkeypress="handleCheckStatusEnter(event)">
-            </div>
-            <button type="button" id="checkStatusBtn" class="btn btn-secondary" onclick="checkStatus()">Cek Status</button>
-            <div id="statusResult" class="status-result"></div>
+                <button type="submit" class="btn">Masuk ke Jaringan</button>
+            </form>
+
+            <div class="divider"><span>atau</span></div>
+
+            <a href="register.html" class="btn-secondary">Belum Punya Akun? Daftar</a>
         </div>
+
+        <div class="footer">© Triple M Hotspot · All rights reserved</div>
     </div>
-
-    <!-- Form Asli MikroTik (Submit Sebenarnya ke Router) -->
-    <form id="mtLoginForm" name="sendin" action="$(link-login-only)" method="post" style="display: none;">
-        <input type="hidden" name="username" id="mt_username">
-        <input type="hidden" name="password" id="mt_password">
-        <input type="hidden" name="dst" value="$(link-orig)">
-        <input type="hidden" name="popup" value="true">
-    </form>
-
-    <script>
-        const BACKEND_URL = 'https://3m-r3if.vercel.app';
-
-        const form = document.getElementById('loginForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        const message = document.getElementById('message');
-        const statusCheck = document.getElementById('statusCheck');
-
-        function showMessage(text, type) {
-            message.textContent = text;
-            message.className = `message ${type}`;
-            message.style.display = 'block';
-        }
-
-        function submitDirectToMikrotik(username, password) {
-            document.getElementById('mt_username').value = username;
-            document.getElementById('mt_password').value = password;
-            document.getElementById('mtLoginForm').submit();
-        }
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const usernameVal = document.getElementById('username').value.trim();
-            const passwordVal = document.getElementById('password').value.trim();
-
-            if (!usernameVal || !passwordVal) {
-                showMessage('Username dan password wajib diisi', 'error');
-                return;
-            }
-
-            submitBtn.disabled = true;
-            btnText.innerHTML = '<span class="loading"></span> Memproses...';
-
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: usernameVal, password: passwordVal })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    const nameUser = data.user && data.user.name ? data.user.name : usernameVal;
-                    showMessage(`Selamat datang, ${nameUser}! Mengalihkan...`, 'success');
-
-                    setTimeout(() => {
-                        submitDirectToMikrotik(usernameVal, passwordVal);
-                    }, 500);
-                } else {
-                    showMessage(data.message || 'Username atau password salah', 'error');
-                    submitBtn.disabled = false;
-                    btnText.textContent = 'Masuk ke Jaringan';
-                }
-            } catch (error) {
-                // Jika API Backend Vercel Error / Offline, langsung bypass login ke MikroTik
-                showMessage('Menghubungkan ke MikroTik...', 'info');
-                setTimeout(() => {
-                    submitDirectToMikrotik(usernameVal, passwordVal);
-                }, 500);
-            }
-        });
-
-        function toggleStatusCheck() {
-            const isVisible = statusCheck.classList.contains('show');
-            if (isVisible) {
-                statusCheck.classList.remove('show');
-            } else {
-                statusCheck.classList.add('show');
-                document.getElementById('checkUsername').focus();
-            }
-        }
-
-        function handleCheckStatusEnter(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                checkStatus();
-            }
-        }
-
-        async function checkStatus() {
-            const usernameInput = document.getElementById('checkUsername');
-            const username = usernameInput.value.trim();
-            const statusResult = document.getElementById('statusResult');
-            const checkStatusBtn = document.getElementById('checkStatusBtn');
-
-            if (!username) {
-                statusResult.textContent = 'Masukkan username terlebih dahulu';
-                statusResult.className = 'status-result not-found';
-                statusResult.style.display = 'block';
-                return;
-            }
-
-            checkStatusBtn.disabled = true;
-            checkStatusBtn.innerHTML = '<span class="loading" style="width:12px;height:12px;margin-right:4px;"></span>...';
-
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/status/${encodeURIComponent(username)}`);
-                const data = await response.json();
-
-                if (data.success) {
-                    let textMsg = `Status: ${data.status.toUpperCase()}`;
-                    if (data.status === 'pending') textMsg += ' - Menunggu approval';
-                    else if (data.status === 'approved') textMsg += ' - Silakan login';
-                    else if (data.status === 'rejected') textMsg += ' - Ditolak';
-
-                    statusResult.textContent = textMsg;
-                    statusResult.className = `status-result ${data.status.toLowerCase()}`;
-                } else {
-                    statusResult.textContent = data.message || 'Status tidak ditemukan';
-                    statusResult.className = 'status-result not-found';
-                }
-            } catch (error) {
-                statusResult.textContent = 'Gagal mengecek status.';
-                statusResult.className = 'status-result not-found';
-            } finally {
-                statusResult.style.display = 'block';
-                checkStatusBtn.disabled = false;
-                checkStatusBtn.textContent = 'Cek Status';
-            }
-        }
-    </script>
 </body>
 </html>
