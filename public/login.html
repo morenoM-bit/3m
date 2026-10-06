@@ -302,11 +302,10 @@
             <div class="card-title">Selamat Datang 👋</div>
             <div class="card-subtitle">Masukkan username dan password kamu</div>
 
-            $(if error)
-            <div class="alert-error" style="display: block;">
-                $(error)
+            <!-- Error Box disembunyikan jika diakses dari web/Vercel -->
+            <div id="errorBox" class="alert-error">
+                <span id="errorMsg">$(error)</span>
             </div>
-            $(endif)
 
             <form name="login" action="$(link-login-only)" method="post">
                 <input type="hidden" name="dst" value="$(link-orig)" />
@@ -359,6 +358,23 @@
 
     <script>
         const BACKEND_URL = 'https://3m-r3if.vercel.app';
+
+        // Bersihkan teks variabel Mikrotik kalau dibuka di web Vercel
+        window.addEventListener('DOMContentLoaded', () => {
+            const errorMsg = document.getElementById('errorMsg');
+            const usernameInput = document.getElementById('username');
+            const errorBox = document.getElementById('errorBox');
+
+            if (usernameInput.value.includes('$(')) {
+                usernameInput.value = '';
+            }
+
+            if (errorMsg && !errorMsg.innerText.includes('$(') && errorMsg.innerText.trim() !== '') {
+                errorBox.style.display = 'block';
+            } else {
+                errorBox.style.display = 'none';
+            }
+        });
 
         function openStatusModal() {
             document.getElementById('statusModal').style.display = 'flex';
