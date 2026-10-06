@@ -1,351 +1,171 @@
+/* ==========================================================================
+   JUDUL: SERVER BACKEND (EXPRESS.JS & SOCKET.IO)
+   NAMA FILE: server.js
+   DESKRIPSI: Server backend untuk menangani API Admin & Trafik Realtime
+   ========================================================================== */
+
+// --------------------------------------------------------------------------
+// BAGIAN 1: IMPORT LIBRARY / MODUL YANG DIBUTUHKAN
+// --------------------------------------------------------------------------
 const express = require('express');
+const http = require('http');
+const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const { Server } = require('socket.io');
 
-const cors = require('cors'); // 1. Tambah modul cors
-
-const path = require('path');
-
-const mikrotikConfig = require('./config/mikrotik');
-
-const storageConfig = require('./config/storage');
-
-
-
+// --------------------------------------------------------------------------
+// BAGIAN 2: INISIALISASI APLIKASI DAN KONFIGURASI SERVER
+// --------------------------------------------------------------------------
 const app = express();
+const server = http.createServer(app);
 
-const PORT = process.env.PORT || 3000;
+// Konfigurasi WebSocket (Socket.io) untuk komunikasi realtime dengan frontend
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Mengizinkan semua domain mengakses server
+    methods: ["GET", "POST"]
+  }
+});
 
-
-
-// 2. Pasang Middleware CORS di sini (Wajib paling atas sebelum router)
-
-app.use(cors({
-
-  origin: '*',
-
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-
-  allowedHeaders: ['Content-Type', 'Authorization']
-
-}));
-
-
-
+app.use(cors());
 app.use(express.json());
 
-app.use(express.urlencoded({ extended: true }));
+// Kunci rahasia JWT & Password Admin (Bisa diganti sesuai kebutuhan)
+const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_triple_m_hotspot';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
-app.use(express.static(path.join(__dirname, 'public')));
+// --------------------------------------------------------------------------
+// BAGIAN 3: DATABASE DUMMY (DATA PENGGUNA MIKROTIK/HOTSPOT)
+// --------------------------------------------------------------------------
+let users = [
+  {
+    id: 1,
+    username: 'user01',
+    status: 'pending', // Pilihan status: pending, active, rejected
+    download: 102450000, // Ukuran data dalam satuan Bytes
+    upload: 52400000,
+    created_at: new Date()
+  },
+  {
+    id: 2,
+    username: 'user02',
+    status: 'active',
+    download: 512000000,
+    upload: 120000000,
+    created_at: new Date()
+  }
+];
 
+// --------------------------------------------------------------------------
+// BAGIAN 4: MIDDLEWARE KEAMANAN (VERIFIKASI TOKEN ADMIN)
+// --------------------------------------------------------------------------
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
 
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'Akses ditolak. Token tidak ditemukan.' });
+  }
 
-// 1. Endpoint Login Admin Panel
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ success: false, message: 'Token tidak valid atau sudah kadaluwarsa.' });
+    }
+    req.user = user;
+    next();
+  });
+}
 
+// --------------------------------------------------------------------------
+// BAGIAN 5: ENDPOINT API (LOGIN & MANAJEMEN USER)
+// --------------------------------------------------------------------------
+
+// 5.1. Endpoint Login Admin
 app.post('/api/admin/login', (req, res) => {
-
   const { password } = req.body;
 
-  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-
-
-
-  if (password === adminPassword) {
-
-    return res.json({ success: true, message: 'Login admin berhasil' });
-
-  } else {
-
-    return res.status(401).json({ success: false, message: 'Password admin salah' });
-
+  if (password === ADMIN_PASSWORD) {
+    const token = jwt.sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '1d' });
+    return res.json({ success: true, token, message: 'Login berhasil' });
   }
 
+  return res.status(401).json({ success: false, message: 'Password salah' });
 });
 
+// 5.2. Endpoint Mengambil Seluruh Data Pengguna
+app.get('/api/users', authenticateToken, (req, res) => {
+  res.json({ success: true, users });
+});
 
+// 5.3. Endpoint Menyetujui Pengguna (Approve)
+app.post('/api/approve', authenticateToken, (req, res) => {
+  const { username } = req.body;
+  const user = users.find(u => u.username === username);
 
-// 2. Endpoint Register User Baru
-
-app.post('/api/register', async (req, res) => {
-
-  try {
-
-    const { username, password, fullName, phone, email } = req.body;
-
-
-
-    if (!username || !password) {
-
-      return res.status(400).json({ success: false, message: 'Username dan password wajib diisi' });
-
-    }
-
-
-
-    const existingUser = await storageConfig.getUserByUsername(username);
-
-    if (existingUser) {
-
-      return res.status(400).json({ success: false, message: 'Username sudah terdaftar' });
-
-    }
-
-
-
-    const newUser = {
-
-      username,
-
-      password,
-
-      fullName: fullName || username,
-
-      phone: phone || '',
-
-      email: email || '',
-
-      status: 'pending',
-
-      createdAt: new Date().toISOString()
-
-    };
-
-
-
-    await storageConfig.addUser(newUser);
-
-
-
-    res.json({ success: true, message: 'Pendaftaran berhasil, menunggu persetujuan admin' });
-
-  } catch (error) {
-
-    console.error('Register error:', error);
-
-    res.status(500).json({ success: false, message: 'Gagal melakukan pendaftaran: ' + error.message });
-
+  if (!user) {
+    return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan' });
   }
 
+  user.status = 'active';
+  res.json({ success: true, message: `Pengguna ${username} telah disetujui.` });
 });
 
+// 5.4. Endpoint Menolak Pengguna (Reject)
+app.post('/api/reject', authenticateToken, (req, res) => {
+  const { username } = req.body;
+  const user = users.find(u => u.username === username);
 
-
-// 3. Endpoint Login User Hotspot
-
-app.post('/api/login', async (req, res) => {
-
-  try {
-
-    const { username, password } = req.body;
-
-
-
-    const user = await storageConfig.getUserByUsername(username);
-
-    if (!user || user.password !== password) {
-
-      return res.status(401).json({ success: false, message: 'Username atau password salah' });
-
-    }
-
-
-
-    if (user.status !== 'approved') {
-
-      return res.status(403).json({ success: false, message: 'Akun Anda belum disetujui oleh admin' });
-
-    }
-
-
-
-    res.json({ success: true, message: 'Login berhasil', user });
-
-  } catch (error) {
-
-    console.error('Login error:', error);
-
-    res.status(500).json({ success: false, message: 'Gagal login: ' + error.message });
-
+  if (!user) {
+    return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan' });
   }
 
+  user.status = 'rejected';
+  res.json({ success: true, message: `Pengguna ${username} ditolak.` });
 });
 
+// 5.5. Endpoint Menghapus Pengguna (Delete)
+app.delete('/api/users/:username', authenticateToken, (req, res) => {
+  const { username } = req.params;
+  const initialLength = users.length;
+  users = users.filter(u => u.username !== username);
 
-
-// 4. Endpoint Approve User (Admin Only)
-
-app.post('/api/approve', async (req, res) => {
-
-  try {
-
-    const { username, adminName } = req.body;
-
-    
-
-    if (!username) {
-
-      return res.status(400).json({ success: false, message: 'Username is required' });
-
-    }
-
-    
-
-    await storageConfig.approveUser(username, adminName || 'Admin');
-
-    
-
-    const userData = await storageConfig.getUserByUsername(username);
-
-    if (!userData) {
-
-      return res.status(404).json({ success: false, message: 'User data not found in storage' });
-
-    }
-
-
-
-    if (mikrotikConfig.addUserToHotspot && typeof mikrotikConfig.addUserToHotspot === 'function') {
-
-      const result = await mikrotikConfig.addUserToHotspot(userData.username, userData.password);
-
-      if (!result.success) {
-
-        console.error('Gagal sync ke MikroTik:', result.message);
-
-      }
-
-    }
-
-    
-
-    res.json({ success: true, message: 'User approved and added to MikroTik successfully' });
-
-  } catch (error) {
-
-    console.error('Approval error:', error);
-
-    res.status(500).json({ success: false, message: 'Approval failed: ' + error.message });
-
+  if (users.length === initialLength) {
+    return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan' });
   }
 
+  res.json({ success: true, message: `Pengguna ${username} berhasil dihapus.` });
 });
 
+// --------------------------------------------------------------------------
+// BAGIAN 6: FITUR REALTIME TRAFFIC MONITOR (SOCKET.IO)
+// --------------------------------------------------------------------------
+io.on('connection', (socket) => {
+  console.log('Admin terhubung ke Realtime Monitor Socket ID:', socket.id);
 
+  // Mengirim data kecepatan trafik (Mbps) secara realtime setiap 1 detik
+  const trafficInterval = setInterval(() => {
+    // Simulasi data trafik acak (Download: 5-50 Mbps, Upload: 1-20 Mbps)
+    const downloadSpeed = (Math.random() * (50 - 5) + 5).toFixed(2);
+    const uploadSpeed = (Math.random() * (20 - 1) + 1).toFixed(2);
 
-// 5. Endpoint Ambil Semua User (Admin Only)
+    socket.emit('trafficData', {
+      timestamp: new Date().toLocaleTimeString(),
+      downloadMbps: parseFloat(downloadSpeed),
+      uploadMbps: parseFloat(uploadSpeed)
+    });
+  }, 1000);
 
-app.get('/api/users', async (req, res) => {
-
-  try {
-
-    const users = await storageConfig.getAllUsers();
-
-    res.json({ success: true, users });
-
-  } catch (error) {
-
-    console.error('Get users error:', error);
-
-    res.status(500).json({ success: false, message: 'Gagal mengambil data user' });
-
-  }
-
+  // Membersihkan koneksi saat admin terputus / mereload halaman
+  socket.on('disconnect', () => {
+    console.log('Admin terputus dari Realtime Monitor');
+    clearInterval(trafficInterval);
+  });
 });
 
-
-
-// 5b. Endpoint Cek Status Spesifik User (Diperlukan oleh tombol Cek Status di login.html)
-
-app.get('/api/users/:username', async (req, res) => {
-
-  try {
-
-    const { username } = req.params;
-
-    const user = await storageConfig.getUserByUsername(username);
-
-
-
-    if (user) {
-
-      return res.json({ 
-
-        success: true, 
-
-        user: { 
-
-          username: user.username, 
-
-          status: user.status 
-
-        } 
-
-      });
-
-    } else {
-
-      return res.json({ success: false, message: 'User tidak ditemukan' });
-
-    }
-
-  } catch (error) {
-
-    console.error('Cek status error:', error);
-
-    res.json({ success: false, message: 'Gagal mengecek status user' });
-
-  }
-
-});
-
-
-
-// 6. Endpoint Ambil Statistik Traffic / Online MikroTik
-
-app.get('/api/mikrotik/stats', async (req, res) => {
-
-  try {
-
-    if (mikrotikConfig.getUsersStats && typeof mikrotikConfig.getUsersStats === 'function') {
-
-      const stats = await mikrotikConfig.getUsersStats();
-
-      return res.json({ success: true, stats });
-
-    }
-
-    res.json({ success: true, stats: [] });
-
-  } catch (error) {
-
-    console.error('Mikrotik stats error:', error);
-
-    res.status(500).json({ success: false, message: 'Gagal mengambil statistik MikroTik' });
-
-  }
-
-});
-
-
-
-// Routing Halaman Admin & Catch-all
-
-app.get('/admin', (req, res) => {
-
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-
-});
-
-
-
-app.get('*', (req, res) => {
-
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-
-});
-
-
-
-app.listen(PORT, () => {
-
-  console.log(`Server running on port ${PORT}`);
-
+// --------------------------------------------------------------------------
+// BAGIAN 7: MENJALANKAN SERVER
+// --------------------------------------------------------------------------
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log(`Server Triple M Hotspot Backend berjalan di port ${PORT}`);
 });
