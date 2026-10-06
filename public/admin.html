@@ -6,7 +6,6 @@
   <title>Admin Panel - Triple M Hotspot</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -19,7 +18,6 @@
       padding: 20px;
     }
 
-    /* Modal Login */
     .login-modal {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -165,7 +163,7 @@
       <h2>Triple M Hotspot</h2>
       <div class="input-box">
         <label>Password Admin</label>
-        <input type="password" id="adminPassword" placeholder="Masukkan password">
+        <input type="password" id="adminPassword" placeholder="Password default: admin123" onkeyup="if(event.key==='Enter') login()">
       </div>
       <button class="btn-act btn-approve" style="width: 100%; padding: 10px;" onclick="login()">Masuk</button>
     </div>
@@ -222,45 +220,47 @@
   </div>
 
   <script>
-    const BACKEND_URL = window.location.origin;
+    const BACKEND_URL = window.location.protocol === 'file:' ? 'http://localhost:5000' : window.location.origin;
 
     let token = localStorage.getItem('adminToken');
     let trafficChart;
     let selectedUser = '';
-    
-    // Default fallback data (Data asli kamu)
-    let currentUsers = [
-      { id: 1, username: 'user01', status: 'pending', download: 102450000, upload: 52400000, downloadSpeed: 0, uploadSpeed: 0 },
-      { id: 2, username: 'user02', status: 'active', download: 512000000, upload: 120000000, downloadSpeed: 12.5, uploadSpeed: 3.2 }
-    ];
+    let pollInterval = null;
 
     if (token) showDashboard();
 
     async function login() {
       const password = document.getElementById('adminPassword').value;
+
+      if (!password) {
+        alert('Masukkan password terlebih dahulu!');
+        return;
+      }
+
       try {
         const res = await fetch(`${BACKEND_URL}/api/admin/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ password })
         });
+
         const data = await res.json();
+
         if (data.success) {
           token = data.token;
           localStorage.setItem('adminToken', token);
           showDashboard();
         } else {
-          alert('Password salah');
+          alert(data.message || 'Password salah!');
         }
       } catch (err) {
-        // Jika API Vercel belum ready, izinkan bypass login demo
-        token = 'demo_token';
-        localStorage.setItem('adminToken', token);
-        showDashboard();
+        console.error('Login error:', err);
+        alert('Gagal terhubung ke backend. Pastikan server aktif!');
       }
     }
 
     function logout() {
+      if (pollInterval) clearInterval(pollInterval);
       localStorage.removeItem('adminToken');
       location.reload();
     }
@@ -270,7 +270,9 @@
       document.getElementById('dashboard').style.display = 'block';
       initTrafficChart();
       loadUsers();
-      startRealtimeSimulation();
+
+      // Polling REST API secara otomatis setiap 2 detik (Sangat stabil di Vercel)
+      pollInterval = setInterval(loadUsers, 2000);
     }
 
     async function loadUsers() {
@@ -278,26 +280,28 @@
         const res = await fetch(`${BACKEND_URL}/api/users`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
+
+        if (res.status === 401 || res.status === 403) {
+          logout();
+          return;
+        }
+
         const data = await res.json();
-        if (data.success && data.users) {
-          currentUsers = data.users;
+        if (data.success) {
+          renderTable(data.users);
+          updateStats(data.users);
+          updateUserDropdown(data.users);
+          updateChartData(data.users);
         }
       } catch (err) {
-        console.log('Menggunakan data bawaan.');
+        console.error('Load users error:', err);
       }
-      refreshUI();
-    }
-
-    function refreshUI() {
-      renderTable(currentUsers);
-      updateStats(currentUsers);
-      updateUserDropdown(currentUsers);
     }
 
     function updateUserDropdown(users) {
       const select = document.getElementById('userSelect');
       const activeUsers = users.filter(u => u.status === 'active');
-      const currentVal = select.value;
+      const currentVal = select.value || selectedUser;
 
       select.innerHTML = '<option value="">-- Pilih Pengguna --</option>';
       activeUsers.forEach(u => {
@@ -309,18 +313,41 @@
 
       if (currentVal && activeUsers.some(u => u.username === currentVal)) {
         select.value = currentVal;
-      } else if (activeUsers.length > 0) {
+        selectedUser = currentVal;
+      } else if (activeUsers.length > 0 && !selectedUser) {
         select.value = activeUsers[0].username;
         selectedUser = activeUsers[0].username;
       }
     }
 
+    function updateChartData(users) {
+      if (!selectedUser || !trafficChart) return;
+
+      const targetUser = users.find(u => u.username === selectedUser);
+      if (targetUser && targetUser.status === 'active') {
+        const timeNow = new Date().toLocaleTimeString();
+
+        if (trafficChart.data.labels.length >= 15) {
+          trafficChart.data.labels.shift();
+          trafficChart.data.datasets[0].data.shift();
+          trafficChart.data.datasets[1].data.shift();
+        }
+
+        trafficChart.data.labels.push(timeNow);
+        trafficChart.data.datasets[0].data.push(targetUser.downloadSpeed || 0);
+        trafficChart.data.datasets[1].data.push(targetUser.uploadSpeed || 0);
+        trafficChart.update();
+      }
+    }
+
     function changeMonitoredUser() {
       selectedUser = document.getElementById('userSelect').value;
-      trafficChart.data.labels = [];
-      trafficChart.data.datasets[0].data = [];
-      trafficChart.data.datasets[1].data = [];
-      trafficChart.update();
+      if (trafficChart) {
+        trafficChart.data.labels = [];
+        trafficChart.data.datasets[0].data = [];
+        trafficChart.data.datasets[1].data = [];
+        trafficChart.update();
+      }
     }
 
     function renderTable(users) {
@@ -351,26 +378,31 @@
       document.getElementById('activeUsers').innerText = users.filter(u => u.status === 'active').length;
     }
 
-    function approveUser(username) {
-      const user = currentUsers.find(u => u.username === username);
-      if (user) user.status = 'active';
-      refreshUI();
+    async function approveUser(username) {
+      await fetch(`${BACKEND_URL}/api/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ username })
+      });
+      loadUsers();
     }
 
-    function rejectUser(username) {
-      const user = currentUsers.find(u => u.username === username);
-      if (user) {
-        user.status = 'rejected';
-        user.downloadSpeed = 0;
-        user.uploadSpeed = 0;
-      }
-      refreshUI();
+    async function rejectUser(username) {
+      await fetch(`${BACKEND_URL}/api/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ username })
+      });
+      loadUsers();
     }
 
-    function deleteUser(username) {
+    async function deleteUser(username) {
       if (confirm(`Hapus pengguna ${username}?`)) {
-        currentUsers = currentUsers.filter(u => u.username !== username);
-        refreshUI();
+        await fetch(`${BACKEND_URL}/api/users/${username}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        loadUsers();
       }
     }
 
@@ -417,42 +449,6 @@
           }
         }
       });
-    }
-
-    // SIMULASI REALTIME DI FRONTEND (MENGHINDARI ERROR 404 VERCEL)
-    function startRealtimeSimulation() {
-      setInterval(() => {
-        currentUsers.forEach(u => {
-          if (u.status === 'active') {
-            u.downloadSpeed = parseFloat((Math.random() * (25 - 2) + 2).toFixed(2));
-            u.uploadSpeed = parseFloat((Math.random() * (8 - 0.5) + 0.5).toFixed(2));
-            u.download += Math.floor(u.downloadSpeed * 125000);
-            u.upload += Math.floor(u.uploadSpeed * 125000);
-          } else {
-            u.downloadSpeed = 0;
-            u.uploadSpeed = 0;
-          }
-        });
-
-        renderTable(currentUsers);
-        updateStats(currentUsers);
-
-        if (selectedUser) {
-          const targetUser = currentUsers.find(u => u.username === selectedUser);
-          if (targetUser && targetUser.status === 'active') {
-            if (trafficChart.data.labels.length >= 15) {
-              trafficChart.data.labels.shift();
-              trafficChart.data.datasets[0].data.shift();
-              trafficChart.data.datasets[1].data.shift();
-            }
-
-            trafficChart.data.labels.push(new Date().toLocaleTimeString());
-            trafficChart.data.datasets[0].data.push(targetUser.downloadSpeed);
-            trafficChart.data.datasets[1].data.push(targetUser.uploadSpeed);
-            trafficChart.update();
-          }
-        }
-      }, 1000);
     }
   </script>
 </body>
