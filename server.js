@@ -252,6 +252,52 @@ app.get('/api/users', async (req, res) => {
 
 
 
+// 5b. Endpoint Cek Status Spesifik User (Diperlukan oleh tombol Cek Status di login.html)
+
+app.get('/api/users/:username', async (req, res) => {
+
+  try {
+
+    const { username } = req.params;
+
+    const user = await storageConfig.getUserByUsername(username);
+
+
+
+    if (user) {
+
+      return res.json({ 
+
+        success: true, 
+
+        user: { 
+
+          username: user.username, 
+
+          status: user.status 
+
+        } 
+
+      });
+
+    } else {
+
+      return res.json({ success: false, message: 'User tidak ditemukan' });
+
+    }
+
+  } catch (error) {
+
+    console.error('Cek status error:', error);
+
+    res.json({ success: false, message: 'Gagal mengecek status user' });
+
+  }
+
+});
+
+
+
 // 6. Endpoint Ambil Statistik Traffic / Online MikroTik
 
 app.get('/api/mikrotik/stats', async (req, res) => {
