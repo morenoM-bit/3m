@@ -1,24 +1,47 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const mikrotikConfig = require('./config/mikrotik');
-const storageConfig = require('./config/storage');
+
+// Import modul config dengan penanganan error fallback
+let mikrotikConfig = {};
+let storageConfig = {};
+
+try {
+  mikrotikConfig = require('./config/mikrotik');
+} catch (e) {
+  console.warn('Warning: ./config/mikrotik tidak ditemukan atau error:', e.message);
+}
+
+try {
+  storageConfig = require('./config/storage');
+} catch (e) {
+  console.warn('Warning: ./config/storage tidak ditemukan atau error:', e.message);
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware CORS
+// -------------------------------------------------------------
+// CONFIGURASI CORS & PREFLIGHT OPTIONS (MENCEGAH CORS BLOCKED)
+// -------------------------------------------------------------
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Tangani permintaan OPTIONS preflight secara eksplisit
+app.options('*', cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Sajikan file statis dari folder public
 app.use(express.static(path.join(__dirname, 'public')));
+
+// -------------------------------------------------------------
+// ENDPOINT API
+// -------------------------------------------------------------
 
 // 1. Endpoint Login Admin Panel
 app.post('/api/admin/login', (req, res) => {
@@ -41,9 +64,11 @@ app.post('/api/register', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Username dan password wajib diisi' });
     }
 
-    const existingUser = await storageConfig.getUserByUsername(username);
-    if (existingUser) {
-      return res.status(400).json({ success: false, message: 'Username sudah terdaftar' });
+    if (storageConfig.getUserByUsername) {
+      const existingUser = await storageConfig.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ success: false, message: 'Username sudah terdaftar' });
+      }
     }
 
     const newUser = {
@@ -56,7 +81,9 @@ app.post('/api/register', async (req, res) => {
       createdAt: new Date().toISOString()
     };
 
-    await storageConfig.addUser(newUser);
+    if (storageConfig.addUser) {
+      await storageConfig.addUser(newUser);
+    }
 
     res.json({ success: true, message: 'Pendaftaran berhasil, menunggu persetujuan admin' });
   } catch (error) {
@@ -69,6 +96,10 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
+
+    if (!storageConfig.getUserByUsername) {
+      return res.status(500).json({ success: false, message: 'Storage module belum siap' });
+    }
 
     const user = await storageConfig.getUserByUsername(username);
     if (!user || user.password !== password) {
@@ -95,14 +126,16 @@ app.post('/api/approve', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Username is required' });
     }
     
-    await storageConfig.approveUser(username, adminName || 'Admin');
+    if (storageConfig.approveUser) {
+      await storageConfig.approveUser(username, adminName || 'Admin');
+    }
     
-    const userData = await storageConfig.getUserByUsername(username);
-    if (!userData) {
-      return res.status(404).json({ success: false, message: 'User data not found in storage' });
+    let userData = null;
+    if (storageConfig.getUserByUsername) {
+      userData = await storageConfig.getUserByUsername(username);
     }
 
-    if (mikrotikConfig.addUserToHotspot && typeof mikrotikConfig.addUserToHotspot === 'function') {
+    if (mikrotikConfig.addUserToHotspot && typeof mikrotikConfig.addUserToHotspot === 'function' && userData) {
       const result = await mikrotikConfig.addUserToHotspot(userData.username, userData.password);
       if (!result.success) {
         console.error('Gagal sync ke MikroTik:', result.message);
@@ -119,7 +152,7 @@ app.post('/api/approve', async (req, res) => {
 // 5. Endpoint Ambil Semua User (Admin Only)
 app.get('/api/users', async (req, res) => {
   try {
-    const users = await storageConfig.getAllUsers();
+    const users = storageConfig.getAllUsers ? await storageConfig.getAllUsers() : [];
     res.json({ success: true, users });
   } catch (error) {
     console.error('Get users error:', error);
@@ -131,7 +164,7 @@ app.get('/api/users', async (req, res) => {
 app.get('/api/users/:username', async (req, res) => {
   try {
     const { username } = req.params;
-    const user = await storageConfig.getUserByUsername(username);
+    const user = storageConfig.getUserByUsername ? await storageConfig.getUserByUsername(username) : null;
 
     if (user) {
       return res.json({ 
@@ -150,7 +183,7 @@ app.get('/api/users/:username', async (req, res) => {
   }
 });
 
-// 6. Endpoint Ambil Statistik Traffic Realtime Per-User (Active Users)
+// 6. Endpoint Traffic Realtime MikroTik
 app.get('/api/mikrotik/active', async (req, res) => {
   try {
     if (mikrotikConfig.getActiveUsers && typeof mikrotikConfig.getActiveUsers === 'function') {
@@ -164,7 +197,7 @@ app.get('/api/mikrotik/active', async (req, res) => {
   }
 });
 
-// 7. Endpoint Ambil Statistik Umum Traffic / Online MikroTik
+// 7. Endpoint Statistik MikroTik
 app.get('/api/mikrotik/stats', async (req, res) => {
   try {
     if (mikrotikConfig.getUsersStats && typeof mikrotikConfig.getUsersStats === 'function') {
@@ -178,21 +211,23 @@ app.get('/api/mikrotik/stats', async (req, res) => {
   }
 });
 
-// =============================================================
-// ROUTING HALAMAN ADMIN, LOGIN & STATIS (VERCEL COMPATIBLE)
-// =============================================================
+// -------------------------------------------------------------
+// ROUTING HALAMAN ADMIN, LOGIN & FALLBACK (VERCEL COMPATIBLE)
+// -------------------------------------------------------------
 
-// Routing khusus Admin
 app.get(['/admin', '/admin.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// Routing khusus Login
 app.get(['/login', '/login.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-// Catch-all fallback route
+app.get(['/register', '/register.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+// Fallback untuk route/file statis lainnya
 app.get('*', (req, res) => {
   const filePath = path.join(__dirname, 'public', req.path);
   res.sendFile(filePath, (err) => {
