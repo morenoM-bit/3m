@@ -67,29 +67,41 @@ class MikrotikConfig {
     try {
       const api = await client.connect();
       
-      // Mengambil daftar user hotspot dan user aktif secara bersamaan
+      // Ambil data user hotspot & active session sekaligus
       const mtUsers = await api.menu('/ip/hotspot/user').get().catch(() => []);
       const mtActive = await api.menu('/ip/hotspot/active').get().catch(() => []);
       
       return mtUsers.map(u => {
-        // Cari sesi aktif dari /ip/hotspot/active
+        // Cari sesi aktif user di /ip/hotspot/active
         const active = mtActive.find(act => act.user && act.user.toLowerCase() === u.name.toLowerCase());
-        
-        // Prioritaskan data real-time dari active session jika user sedang online
-        const bytesIn = active ? (active['bytes-in'] || active['bytes-in-total'] || u['bytes-in'] || 0) : (u['bytes-in'] || 0);
-        const bytesOut = active ? (active['bytes-out'] || active['bytes-out-total'] || u['bytes-out'] || 0) : (u['bytes-out'] || 0);
-        const packetsIn = active ? (active['packets-in'] || u['packets-in'] || 0) : (u['packets-in'] || 0);
-        const packetsOut = active ? (active['packets-out'] || u['packets-out'] || 0) : (u['packets-out'] || 0);
+
+        // Ambil data bytes-in & bytes-out dengan opsi fallback berbagai field nama RouterOS
+        const bytesInVal = active
+          ? (active['bytes-in'] || active['bytes-in-total'] || active.bytesIn || u['bytes-in'] || u['bytes-in-total'] || 0)
+          : (u['bytes-in'] || u['bytes-in-total'] || u.bytesIn || 0);
+
+        const bytesOutVal = active
+          ? (active['bytes-out'] || active['bytes-out-total'] || active.bytesOut || u['bytes-out'] || u['bytes-out-total'] || 0)
+          : (u['bytes-out'] || u['bytes-out-total'] || u.bytesOut || 0);
+
+        const packetsInVal = active
+          ? (active['packets-in'] || active.packetsIn || u['packets-in'] || 0)
+          : (u['packets-in'] || u.packetsIn || 0);
+
+        const packetsOutVal = active
+          ? (active['packets-out'] || active.packetsOut || u['packets-out'] || 0)
+          : (u['packets-out'] || u.packetsOut || 0);
+
         const uptime = active ? `${active.uptime} (Online)` : (u.uptime || '00:00:00');
 
         return {
           name: u.name,
           user: u.name,
           uptime: uptime,
-          'bytes-in': bytesIn,
-          'bytes-out': bytesOut,
-          'packets-in': packetsIn,
-          'packets-out': packetsOut
+          'bytes-in': Number(bytesInVal),
+          'bytes-out': Number(bytesOutVal),
+          'packets-in': Number(packetsInVal),
+          'packets-out': Number(packetsOutVal)
         };
       });
     } catch (error) {
