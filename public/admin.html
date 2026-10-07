@@ -207,16 +207,21 @@
         .section-title { font-size: 17px; font-weight: 700; color: #fff; }
         .section-title span { color: rgba(255,255,255,0.4); font-size: 13px; font-weight: 400; margin-left: 8px; }
 
-        .refresh-btn {
-            padding: 9px 18px; background: rgba(0,212,255,0.1); color: #00d4ff;
-            border: 1px solid rgba(0,212,255,0.25); border-radius: 10px; cursor: pointer;
-            font-size: 13px; font-weight: 600; font-family: inherit; transition: all 0.2s;
+        .realtime-indicator {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 12px; color: #00e676; background: rgba(0,230,118,0.1);
+            border: 1px solid rgba(0,230,118,0.25); padding: 6px 14px; border-radius: 20px;
         }
 
-        .refresh-btn:hover { background: rgba(0,212,255,0.2); }
+        .pulse-dot {
+            width: 8px; height: 8px; background: #00e676; border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0,230,118,0.8); animation: pulseDot 1s ease-in-out infinite;
+        }
+
+        @keyframes pulseDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.85); } }
 
         .table-container { overflow-x: auto; border-radius: 12px; border: 1px solid rgba(255,255,255,0.07); }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        table { width: 100%; border-collapse: collapse; min-width: 950px; }
         thead { background: rgba(0,212,255,0.05); }
 
         th {
@@ -233,9 +238,15 @@
         .status.approved { background: rgba(0,230,118,0.13); color: #00e676; border: 1px solid rgba(0,230,118,0.3); }
         .status.rejected { background: rgba(255,82,82,0.13); color: #ff5252; border: 1px solid rgba(255,82,82,0.3); }
 
-        .traffic-box { font-size: 12px; line-height: 1.4; }
-        .traffic-up { color: #00d4ff; font-weight: 500; }
-        .traffic-down { color: #00e676; font-weight: 500; }
+        .traffic-box { font-size: 12px; line-height: 1.5; font-family: 'Courier New', Courier, monospace; }
+        .traffic-up { color: #00d4ff; font-weight: 600; }
+        .traffic-down { color: #00e676; font-weight: 600; }
+        .traffic-packets { color: rgba(255,255,255,0.4); font-size: 11px; }
+
+        .uptime-badge {
+            display: inline-block; padding: 4px 10px; background: rgba(0,212,255,0.1);
+            color: #00d4ff; border-radius: 6px; font-family: monospace; font-size: 12px; font-weight: 600;
+        }
 
         .action-btn {
             padding: 6px 12px; border: none; border-radius: 7px; cursor: pointer;
@@ -320,10 +331,13 @@
         <div class="users-section">
             <div class="section-header">
                 <div class="section-title">
-                    Daftar User & Trafik Data
-                    <span>Kelola pengguna & statistik jaringan</span>
+                    Daftar User & Live Traffic
+                    <span>Statistik MikroTik Real-time</span>
                 </div>
-                <button class="refresh-btn" onclick="loadUsers()">🔄 Refresh</button>
+                <div class="realtime-indicator">
+                    <div class="pulse-dot"></div>
+                    Live Update (3s)
+                </div>
             </div>
 
             <div class="table-container">
@@ -332,16 +346,16 @@
                         <tr>
                             <th>Pengguna</th>
                             <th>Username</th>
-                            <th>Telepon</th>
-                            <th>Penggunaan Data</th>
+                            <th>Uptime</th>
+                            <th>Bytes (In / Out)</th>
+                            <th>Packets (In / Out)</th>
                             <th>Status</th>
-                            <th>Tanggal Daftar</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="usersTableBody">
                         <tr class="loading-row">
-                            <td colspan="7"><span class="spinner"></span> Memuat data...</td>
+                            <td colspan="7"><span class="spinner"></span> Memuat data live...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -353,6 +367,7 @@
         const BACKEND_URL = window.location.origin;
         let isAdminLoggedIn = false;
         let adminName = 'Admin';
+        let autoRefreshTimer = null;
 
         if (localStorage.getItem('adminLoggedIn') === 'true') {
             isAdminLoggedIn = true;
@@ -398,11 +413,20 @@
             document.getElementById('loginModal').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
             document.getElementById('adminName').textContent = adminName;
-            loadUsers();
+            
+            // Load pertama kali
+            loadUsers(true);
+
+            // Set Real-Time Auto Refresh tiap 3 detik
+            if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+            autoRefreshTimer = setInterval(() => {
+                loadUsers(false);
+            }, 3000);
         }
 
         function logout() {
             isAdminLoggedIn = false;
+            if (autoRefreshTimer) clearInterval(autoRefreshTimer);
             localStorage.removeItem('adminLoggedIn');
             localStorage.removeItem('adminName');
             document.getElementById('loginModal').style.display = 'flex';
@@ -411,11 +435,11 @@
         }
 
         function formatBytes(bytes) {
-            if (!bytes || bytes === 0) return '0 B';
+            if (!bytes || bytes == 0) return '0 B';
             const k = 1024;
-            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            const sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
         }
 
         async function approveUser(username) {
@@ -428,7 +452,7 @@
                 const data = await res.json();
                 if (data.success) {
                     alert('User berhasil disetujui');
-                    loadUsers();
+                    loadUsers(true);
                 } else {
                     alert(data.message);
                 }
@@ -437,12 +461,13 @@
             }
         }
 
-        async function loadUsers() {
+        async function loadUsers(isInitialLoad = false) {
             const tableBody = document.getElementById('usersTableBody');
-            tableBody.innerHTML = `<tr class="loading-row"><td colspan="7"><span class="spinner"></span> Memuat data...</td></tr>`;
+            if (isInitialLoad) {
+                tableBody.innerHTML = `<tr class="loading-row"><td colspan="7"><span class="spinner"></span> Memuat data real-time...</td></tr>`;
+            }
 
             try {
-                // Ambil data users dari storage dan statistik dari Mikrotik secara bersamaan
                 const [usersRes, statsRes] = await Promise.all([
                     fetch(`${BACKEND_URL}/api/users`).then(r => r.json()).catch(() => ({ success: false })),
                     fetch(`${BACKEND_URL}/api/mikrotik/stats`).then(r => r.json()).catch(() => ({ success: false }))
@@ -460,43 +485,53 @@
                     if (users.length === 0) {
                         tableBody.innerHTML = `<tr class="empty-row"><td colspan="7">Belum ada user terdaftar</td></tr>`;
                     } else {
-                        tableBody.innerHTML = '';
+                        let htmlBuffer = '';
                         users.forEach(user => {
-                            const row = document.createElement('tr');
-                            const dateStr = user.timestamp ? new Date(user.timestamp).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
-                            
-                            // Cari statistik data penggunaan Mikrotik berdasarkan username
+                            // Cari statistik user dari MikroTik API
                             const userStat = stats.find(s => s.name && s.name.toLowerCase() === user.username.toLowerCase());
+                            
+                            const uptime = userStat && userStat.uptime ? userStat.uptime : '00:00:00';
                             const bytesIn = userStat ? formatBytes(parseInt(userStat['bytes-in'] || 0, 10)) : '0 B';
                             const bytesOut = userStat ? formatBytes(parseInt(userStat['bytes-out'] || 0, 10)) : '0 B';
+                            const packetsIn = userStat ? (userStat['packets-in'] || '0') : '0';
+                            const packetsOut = userStat ? (userStat['packets-out'] || '0') : '0';
 
-                            row.innerHTML = `
-                                <td>
-                                    <div class="user-name">${user.name || user.username}</div>
-                                    <div class="user-email">${user.email || '-'}</div>
-                                </td>
-                                <td>${user.username}</td>
-                                <td>${user.phone || '-'}</td>
-                                <td>
-                                    <div class="traffic-box">
-                                        <div class="traffic-up">⬆️ ${bytesIn}</div>
-                                        <div class="traffic-down">⬇️ ${bytesOut}</div>
-                                    </div>
-                                </td>
-                                <td><span class="status ${user.status}">${user.status}</span></td>
-                                <td>${dateStr}</td>
-                                <td>
-                                    ${user.status === 'pending' 
-                                        ? `<button class="action-btn approve-btn" onclick="approveUser('${user.username}')">Setujui</button>` 
-                                        : '-'}
-                                </td>
+                            htmlBuffer += `
+                                <tr>
+                                    <td>
+                                        <div class="user-name">${user.name || user.username}</div>
+                                        <div class="user-email">${user.phone || user.email || '-'}</div>
+                                    </td>
+                                    <td><strong>${user.username}</strong></td>
+                                    <td><span class="uptime-badge">⏱️ ${uptime}</span></td>
+                                    <td>
+                                        <div class="traffic-box">
+                                            <div class="traffic-up">In: ${bytesIn}</div>
+                                            <div class="traffic-down">Out: ${bytesOut}</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="traffic-box">
+                                            <div class="traffic-packets">In: ${packetsIn} pkts</div>
+                                            <div class="traffic-packets">Out: ${packetsOut} pkts</div>
+                                        </div>
+                                    </td>
+                                    <td><span class="status ${user.status}">${user.status}</span></td>
+                                    <td>
+                                        ${user.status === 'pending' 
+                                            ? `<button class="action-btn approve-btn" onclick="approveUser('${user.username}')">Setujui</button>` 
+                                            : '-'}
+                                    </td>
+                                </tr>
                             `;
-                            tableBody.appendChild(row);
                         });
+                        tableBody.innerHTML = htmlBuffer;
                     }
                 }
             } catch (error) {
-                tableBody.innerHTML = `<tr class="empty-row"><td colspan="7">Gagal memuat data dari server.</td></tr>`;
+                if (isInitialLoad) {
+                    tableBody.innerHTML = `<tr class="empty-row"><td colspan="7">Gagal memuat data dari server.</td></tr>`;
+                }
             }
         }
     </script>
