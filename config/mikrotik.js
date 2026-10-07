@@ -5,7 +5,6 @@ class MikrotikConfig {
     this.host = process.env.MIKROTIK_HOST || process.env.MIKROTIK_IP || 'idn27.tunnel.id';
     this.user = process.env.MIKROTIK_USER || process.env.MIKROTIK_API_USER;
     this.password = process.env.MIKROTIK_PASSWORD || process.env.MIKROTIK_API_PASSWORD;
-    // Set default port remote Tunnel.id ke 3111
     this.port = parseInt(process.env.MIKROTIK_PORT || process.env.MIKROTIK_API_PORT || '3111', 10);
   }
 
