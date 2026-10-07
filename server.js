@@ -7,6 +7,7 @@ const storageConfig = require('./config/storage');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Middleware CORS
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -15,6 +16,8 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Sajikan file statis dari folder public
 app.use(express.static(path.join(__dirname, 'public')));
 
 // 1. Endpoint Login Admin Panel
@@ -175,13 +178,28 @@ app.get('/api/mikrotik/stats', async (req, res) => {
   }
 });
 
-// Routing Halaman Admin & Catch-all
-app.get('/admin', (req, res) => {
+// =============================================================
+// ROUTING HALAMAN ADMIN, LOGIN & STATIS (VERCEL COMPATIBLE)
+// =============================================================
+
+// Routing khusus Admin
+app.get(['/admin', '/admin.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
+// Routing khusus Login
+app.get(['/login', '/login.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// Catch-all fallback route
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  const filePath = path.join(__dirname, 'public', req.path);
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      res.sendFile(path.join(__dirname, 'public', 'login.html'));
+    }
+  });
 });
 
 app.listen(PORT, () => {
