@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Triple M Hotspot - Login</title>
+    <title>Triple M Hotspot - Admin Panel</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
             background: #0a0e1a;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            padding: 24px;
             position: relative;
             overflow-x: hidden;
         }
@@ -26,130 +25,105 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(ellipse at 30% 40%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
-                        radial-gradient(ellipse at 70% 70%, rgba(0, 122, 255, 0.08) 0%, transparent 50%),
-                        radial-gradient(ellipse at 10% 80%, rgba(120, 0, 255, 0.05) 0%, transparent 50%);
-            animation: bgMove 8s ease-in-out infinite alternate;
+            background: radial-gradient(ellipse at 10% 30%, rgba(0, 212, 255, 0.06) 0%, transparent 50%),
+                        radial-gradient(ellipse at 90% 70%, rgba(0, 122, 255, 0.06) 0%, transparent 50%);
             pointer-events: none;
             z-index: 0;
-        }
-
-        @keyframes bgMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(2%, 2%); }
         }
 
         body::after {
             content: '';
             position: fixed;
             inset: 0;
-            background-image: radial-gradient(circle, rgba(0, 212, 255, 0.12) 1px, transparent 1px);
+            background-image: radial-gradient(circle, rgba(0, 212, 255, 0.07) 1px, transparent 1px);
             background-size: 40px 40px;
             pointer-events: none;
             z-index: 0;
         }
 
-        .wrapper {
+        .page-content {
             position: relative;
             z-index: 1;
-            width: 100%;
-            max-width: 420px;
+            max-width: 1280px;
+            margin: 0 auto;
         }
 
-        .brand {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .brand-logo {
-            display: inline-flex;
-            align-items: center;
+        /* ======= LOGIN MODAL ======= */
+        .login-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
             justify-content: center;
-            width: 62px;
-            height: 62px;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+
+        .login-box {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 40px 36px;
+            border-radius: 24px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+            backdrop-filter: blur(20px);
+        }
+
+        .login-box-logo {
+            width: 64px;
+            height: 64px;
             background: linear-gradient(135deg, #00d4ff, #007aff);
             border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 28px;
-            margin-bottom: 12px;
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+            margin: 0 auto 16px;
+            box-shadow: 0 0 30px rgba(0,212,255,0.4);
             animation: pulse 2.5s ease-in-out infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 30px rgba(0, 212, 255, 0.4); }
-            50% { box-shadow: 0 0 50px rgba(0, 212, 255, 0.7); }
+            0%, 100% { box-shadow: 0 0 30px rgba(0,212,255,0.4); }
+            50% { box-shadow: 0 0 50px rgba(0,212,255,0.7); }
         }
 
-        .brand-name {
-            font-size: 22px;
-            font-weight: 800;
-            color: #ffffff;
-            letter-spacing: 1px;
-        }
-
-        .brand-name span { color: #00d4ff; }
-
-        .brand-tagline {
-            font-size: 11px;
-            color: rgba(255,255,255,0.4);
-            margin-top: 4px;
-            letter-spacing: 2.5px;
-            text-transform: uppercase;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 36px 32px;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
-        }
-
-        .card-title {
+        .login-box h2 {
+            color: #fff;
             font-size: 20px;
             font-weight: 700;
-            color: #fff;
             margin-bottom: 4px;
         }
 
-        .card-subtitle {
+        .login-box p {
+            color: rgba(255,255,255,0.4);
             font-size: 13px;
-            color: rgba(255, 255, 255, 0.4);
             margin-bottom: 24px;
         }
 
-        .form-group {
-            margin-bottom: 18px;
+        .login-box .input-wrapper {
+            position: relative;
+            margin-bottom: 14px;
         }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 7px;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 500;
-            font-size: 12px;
-            letter-spacing: 0.3px;
-        }
-
-        .input-wrapper { position: relative; }
-
-        .input-icon {
+        .login-box .input-icon {
             position: absolute;
-            left: 14px;
+            left: 13px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 15px;
+            font-size: 16px;
+            opacity: 0.5;
             pointer-events: none;
-            opacity: 0.55;
         }
 
-        .form-group input {
+        .login-box input {
             width: 100%;
-            padding: 13px 14px 13px 40px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            padding: 13px 15px 13px 42px;
+            background: rgba(255,255,255,0.07);
+            border: 1.5px solid rgba(255,255,255,0.1);
             border-radius: 12px;
             font-size: 14px;
             font-family: inherit;
@@ -157,19 +131,18 @@
             transition: all 0.3s;
         }
 
-        .form-group input::placeholder { color: rgba(255, 255, 255, 0.28); }
-
-        .form-group input:focus {
+        .login-box input::placeholder { color: rgba(255,255,255,0.3); }
+        .login-box input:focus {
             outline: none;
             border-color: #00d4ff;
-            background: rgba(0, 212, 255, 0.07);
-            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.12);
+            background: rgba(0,212,255,0.08);
+            box-shadow: 0 0 0 3px rgba(0,212,255,0.15);
         }
 
-        .btn {
+        .login-box button[type="submit"] {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #00d4ff 0%, #007aff 100%);
+            padding: 13px;
+            background: linear-gradient(135deg, #00d4ff, #007aff);
             color: white;
             border: none;
             border-radius: 12px;
@@ -178,279 +151,816 @@
             font-family: inherit;
             cursor: pointer;
             transition: all 0.3s;
-            margin-top: 10px;
+            margin-top: 4px;
         }
 
-        .btn:hover {
+        .login-box button[type="submit"]:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(0, 122, 255, 0.45);
+            box-shadow: 0 12px 30px rgba(0,122,255,0.4);
         }
 
-        .btn-secondary {
-            display: block;
-            text-align: center;
-            width: 100%;
-            padding: 13px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #00d4ff;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s;
+        .login-message {
+            padding: 10px 14px;
+            border-radius: 10px;
             margin-top: 12px;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(0, 212, 255, 0.12);
-            border-color: #00d4ff;
-        }
-
-        .btn-status {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            background: transparent;
-            border: 1px dashed rgba(0, 212, 255, 0.5);
-            color: #00d4ff;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 12px;
-            text-align: center;
-        }
-
-        .btn-status:hover {
-            background: rgba(0, 212, 255, 0.1);
-            border-color: #00d4ff;
-        }
-
-        .modal-overlay {
             display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(10, 14, 26, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: 9999;
-            justify-content: center;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .login-message.error {
+            background: rgba(255,82,82,0.15);
+            color: #ff5252;
+            border: 1px solid rgba(255,82,82,0.3);
+        }
+
+        /* ======= DASHBOARD ======= */
+        .dashboard { display: none; }
+
+        /* Top navbar */
+        .navbar {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            padding: 20px;
+            backdrop-filter: blur(10px);
         }
 
-        .modal-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 20px;
-            padding: 24px;
-            width: 100%;
-            max-width: 360px;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-        }
-
-        .divider {
+        .navbar-brand {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin: 20px 0;
         }
 
-        .divider::before, .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: rgba(255,255,255,0.08);
+        .navbar-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #00d4ff, #007aff);
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 0 15px rgba(0,212,255,0.35);
         }
 
-        .divider span {
-            font-size: 12px;
-            color: rgba(255,255,255,0.3);
+        .navbar-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
         }
 
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            color: rgba(255,255,255,0.18);
+        .navbar-title span { color: #00d4ff; }
+
+        .navbar-subtitle {
             font-size: 11px;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        .alert-error {
-            background: rgba(255, 82, 82, 0.15);
-            border: 1px solid rgba(255, 82, 82, 0.3);
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .admin-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,212,255,0.08);
+            border: 1px solid rgba(0,212,255,0.2);
+            border-radius: 30px;
+            padding: 6px 14px;
+        }
+
+        .admin-dot {
+            width: 8px;
+            height: 8px;
+            background: #00e676;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(0,230,118,0.7);
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .admin-badge span {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .logout-btn {
+            padding: 9px 18px;
+            background: rgba(255,82,82,0.12);
             color: #ff5252;
-            padding: 10px 14px;
+            border: 1px solid rgba(255,82,82,0.25);
             border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,82,82,0.22);
+        }
+
+        /* Stats grid */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 22px 24px;
+            backdrop-filter: blur(10px);
+            transition: border-color 0.2s, transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(0,212,255,0.25);
+            transform: translateY(-2px);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .stat-card:nth-child(1)::before { background: linear-gradient(90deg, #00d4ff, #007aff); }
+        .stat-card:nth-child(2)::before { background: linear-gradient(90deg, #ffc107, #ff9800); }
+        .stat-card:nth-child(3)::before { background: linear-gradient(90deg, #00e676, #00b0ff); }
+        .stat-card:nth-child(4)::before { background: linear-gradient(90deg, #ff5252, #f50057); }
+
+        .stat-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
             font-size: 12px;
-            margin-bottom: 18px;
+            color: rgba(255,255,255,0.4);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+        }
+
+        /* Users section */
+        .users-section {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 28px;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .section-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .section-title span {
+            color: rgba(255,255,255,0.4);
+            font-size: 13px;
+            font-weight: 400;
+            margin-left: 8px;
+        }
+
+        .refresh-btn {
+            padding: 9px 18px;
+            background: rgba(0,212,255,0.1);
+            color: #00d4ff;
+            border: 1px solid rgba(0,212,255,0.25);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(0,212,255,0.2);
+        }
+
+        /* Message banner */
+        .message {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
             display: none;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: rgba(0,230,118,0.13);
+            color: #00e676;
+            border: 1px solid rgba(0,230,118,0.3);
+        }
+
+        .message.error {
+            background: rgba(255,82,82,0.13);
+            color: #ff5252;
+            border: 1px solid rgba(255,82,82,0.3);
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.07);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        thead {
+            background: rgba(0,212,255,0.05);
+        }
+
+        th {
+            padding: 14px 16px;
+            text-align: left;
+            color: rgba(255,255,255,0.5);
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 16px;
+            color: rgba(255,255,255,0.75);
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            vertical-align: middle;
+        }
+
+        tbody tr {
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: rgba(255,255,255,0.03);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status badges */
+        .status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .status.pending {
+            background: rgba(255,193,7,0.15);
+            color: #ffc107;
+            border: 1px solid rgba(255,193,7,0.3);
+        }
+
+        .status.approved {
+            background: rgba(0,230,118,0.13);
+            color: #00e676;
+            border: 1px solid rgba(0,230,118,0.3);
+        }
+
+        .status.rejected {
+            background: rgba(255,82,82,0.13);
+            color: #ff5252;
+            border: 1px solid rgba(255,82,82,0.3);
+        }
+
+        /* Traffic info */
+        .traffic-info {
+            font-size: 12px;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.7;
+        }
+
+        .traffic-info span {
+            font-weight: 600;
+            color: rgba(255,255,255,0.75);
+        }
+
+        /* Action buttons */
+        .actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .approve-btn {
+            background: rgba(0,230,118,0.15);
+            color: #00e676;
+            border: 1px solid rgba(0,230,118,0.3);
+        }
+
+        .approve-btn:hover:not(:disabled) {
+            background: rgba(0,230,118,0.25);
+        }
+
+        .reject-btn {
+            background: rgba(255,82,82,0.13);
+            color: #ff5252;
+            border: 1px solid rgba(255,82,82,0.3);
+        }
+
+        .reject-btn:hover:not(:disabled) {
+            background: rgba(255,82,82,0.23);
+        }
+
+        .delete-btn {
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .delete-btn:hover:not(:disabled) {
+            background: rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.8);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loading state */
+        .loading-row td {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255,255,255,0.3);
+            font-size: 14px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2.5px solid rgba(0,212,255,0.2);
+            border-radius: 50%;
+            border-top-color: #00d4ff;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Empty state */
+        .empty-row td {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        .empty-state-text {
+            color: rgba(255,255,255,0.3);
+            font-size: 14px;
+        }
+
+        /* User name cell */
+        .user-name {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .user-email {
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+            margin-top: 2px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body { padding: 14px; }
+            .navbar { padding: 14px 16px; }
+            .navbar-subtitle { display: none; }
+            .users-section { padding: 20px 16px; }
         }
     </style>
 </head>
 <body>
-    <div class="wrapper">
-        <div class="brand">
-            <div class="brand-logo">📡</div>
-            <div class="brand-name">Triple <span>M</span> Hotspot</div>
-            <div class="brand-tagline">High Speed Internet Access</div>
-        </div>
 
-        <div class="card">
-            <div class="card-title">Selamat Datang 👋</div>
-            <div class="card-subtitle">Masukkan username dan password kamu</div>
-
-            <div id="errorBox" class="alert-error">
-                <span id="errorMsg">$(error)</span>
-            </div>
-
-            <form id="loginForm" name="login" action="$(link-login-only)" method="post" onsubmit="handleUserLogin(event)">
-                <input type="hidden" name="dst" value="$(link-orig)" />
-                <input type="hidden" name="popup" value="true" />
-
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <div class="input-wrapper">
-                        <span class="input-icon">🏷️</span>
-                        <input type="text" id="username" name="username" value="$(username)" required placeholder="Masukkan username">
-                    </div>
+    <!-- ===== LOGIN MODAL ===== -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-box">
+            <div class="login-box-logo">📡</div>
+            <h2>Triple M Hotspot</h2>
+            <p>Masuk sebagai administrator</p>
+            <form id="loginForm">
+                <div class="input-wrapper">
+                    <span class="input-icon">🔐</span>
+                    <input type="password" id="adminPassword" placeholder="Password admin" required>
                 </div>
-
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="input-wrapper">
-                        <span class="input-icon">🔑</span>
-                        <input type="password" id="password" name="password" required placeholder="Masukkan password">
-                    </div>
-                </div>
-
-                <button type="submit" id="submitBtn" class="btn">Masuk ke Jaringan</button>
+                <button type="submit">Masuk ke Panel</button>
             </form>
-
-            <div class="divider"><span>atau</span></div>
-
-            <a href="register.html" class="btn-secondary">Belum Punya Akun? Daftar</a>
-            <button type="button" class="btn-status" onclick="openStatusModal()">🔍 Cek Status Pendaftaran</button>
+            <div class="login-message" id="loginMessage"></div>
         </div>
-
-        <div class="footer">© Triple M Hotspot · All rights reserved</div>
     </div>
 
-    <div id="statusModal" class="modal-overlay">
-        <div class="modal-card">
-            <h3 style="color: #fff; font-size: 16px; margin-bottom: 6px;">Cek Status Akun</h3>
-            <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 16px;">Masukkan username pendaftaran kamu:</p>
-            
-            <div class="form-group" style="margin-bottom: 12px;">
-                <input type="text" id="checkUsernameInput" placeholder="Masukkan username..." style="padding: 10px 14px;">
-            </div>
-            
-            <button type="button" class="btn" onclick="userCheckStatus()" style="margin-top: 0;">Cek Sekarang</button>
-            
-            <div id="statusResultBox" style="margin-top: 14px; font-size: 13px; font-weight: 500; min-height: 20px;"></div>
+    <!-- ===== DASHBOARD ===== -->
+    <div class="page-content dashboard" id="dashboard">
 
-            <button type="button" onclick="closeStatusModal()" style="background: none; border: none; color: rgba(255,255,255,0.4); font-size: 12px; cursor: pointer; margin-top: 14px;">Tutup</button>
+        <!-- Navbar -->
+        <div class="navbar">
+            <div class="navbar-brand">
+                <div class="navbar-logo">📡</div>
+                <div>
+                    <div class="navbar-title">Triple <span>M</span> Hotspot</div>
+                    <div class="navbar-subtitle">Admin Panel</div>
+                </div>
+            </div>
+            <div class="navbar-right">
+                <div class="admin-badge">
+                    <div class="admin-dot"></div>
+                    <span id="adminName">Admin</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">Keluar</button>
+            </div>
         </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-label">Total Users</div>
+                <div class="stat-number" id="totalUsers">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-label">Pending</div>
+                <div class="stat-number" id="pendingUsers">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-label">Approved</div>
+                <div class="stat-number" id="approvedUsers">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">❌</div>
+                <div class="stat-label">Rejected</div>
+                <div class="stat-number" id="rejectedUsers">0</div>
+            </div>
+        </div>
+
+        <!-- Users table -->
+        <div class="users-section">
+            <div class="section-header">
+                <div class="section-title">
+                    Daftar User
+                    <span>Kelola pengguna jaringan</span>
+                </div>
+                <button class="refresh-btn" onclick="loadUsers()">🔄 Refresh</button>
+            </div>
+
+            <div class="message" id="message"></div>
+
+            <div class="table-container">
+                <table id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>Pengguna</th>
+                            <th>Username</th>
+                            <th>Telepon</th>
+                            <th>Status</th>
+                            <th>Tanggal Daftar</th>
+                            <th>Penggunaan Traffic</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr class="loading-row">
+                            <td colspan="7">
+                                <span class="spinner"></span>
+                                Memuat data...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        const BACKEND_URL = 'https://3m-r3if.vercel.app';
+        // Konfigurasi Alamat Backend
+        const BACKEND_URL = window.location.origin.includes('vercel.app') 
+            ? window.location.origin 
+            : 'https://nama-proyek-kamu.vercel.app';
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const errorMsg = document.getElementById('errorMsg');
-            const usernameInput = document.getElementById('username');
-            const errorBox = document.getElementById('errorBox');
+        let isAdminLoggedIn = false;
+        let adminName = 'Admin';
 
-            if (usernameInput.value.includes('$(')) {
-                usernameInput.value = '';
-            }
+        // Format Byte ke KB, MB, atau GB
+        function formatBytes(bytes) {
+            if (!bytes || bytes == 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
 
-            if (errorMsg && !errorMsg.innerText.includes('$(') && errorMsg.innerText.trim() !== '') {
-                errorBox.style.display = 'block';
-            } else {
-                errorBox.style.display = 'none';
-            }
-        });
+        // Check if already logged in
+        if (localStorage.getItem('adminLoggedIn') === 'true') {
+            isAdminLoggedIn = true;
+            adminName = localStorage.getItem('adminName') || 'Admin';
+            showDashboard();
+        }
 
-        // Intercept Form Submit: Cek dulu ke Backend Vercel sebelum submit ke MikroTik
-        async function handleUserLogin(e) {
+        // Login form
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const usernameInput = document.getElementById('username').value.trim();
-            const passwordInput = document.getElementById('password').value.trim();
-            const errorBox = document.getElementById('errorBox');
-            const errorMsg = document.getElementById('errorMsg');
-            const submitBtn = document.getElementById('submitBtn');
-
-            submitBtn.innerText = 'Memverifikasi...';
-            submitBtn.disabled = true;
+            const password = document.getElementById('adminPassword').value;
 
             try {
-                const response = await fetch(`${BACKEND_URL}/api/login`, {
+                const response = await fetch(`${BACKEND_URL}/api/admin/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: usernameInput, password: passwordInput })
+                    body: JSON.stringify({ password })
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    // Jika sukses dan status 'approved', lanjutkan form submit ke MikroTik
-                    document.getElementById('loginForm').submit();
+                    isAdminLoggedIn = true;
+                    localStorage.setItem('adminLoggedIn', 'true');
+                    localStorage.setItem('adminName', adminName);
+                    showDashboard();
                 } else {
-                    errorMsg.innerText = data.message || 'Login gagal. Periksa akun Anda.';
-                    errorBox.style.display = 'block';
-                    submitBtn.innerText = 'Masuk ke Jaringan';
-                    submitBtn.disabled = false;
-                }
-            } catch (err) {
-                // Jika jaringan error/offline ke Vercel, tetap izinkan login MikroTik langsung
-                document.getElementById('loginForm').submit();
-            }
-        }
-
-        function openStatusModal() {
-            document.getElementById('statusModal').style.display = 'flex';
-            document.getElementById('statusResultBox').innerHTML = '';
-            document.getElementById('checkUsernameInput').value = '';
-        }
-
-        function closeStatusModal() {
-            document.getElementById('statusModal').style.display = 'none';
-        }
-
-        async function userCheckStatus() {
-            const username = document.getElementById('checkUsernameInput').value.trim();
-            const resultBox = document.getElementById('statusResultBox');
-
-            if (!username) {
-                resultBox.innerHTML = '<span style="color: #ff5252;">Username tidak boleh kosong!</span>';
-                return;
-            }
-
-            resultBox.innerHTML = '<span style="color: #aaa;">Mengecek status...</span>';
-
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/users/${username}`);
-                const data = await response.json();
-
-                if (data.success && data.user) {
-                    const status = data.user.status;
-                    if (status === 'approved') {
-                        resultBox.innerHTML = '<span style="color: #00e676;">✅ Akun kamu SUDAH AKTIF! Silakan login.</span>';
-                    } else if (status === 'pending') {
-                        resultBox.innerHTML = '<span style="color: #ffc107;">⏳ Akun masih PENDING. Tunggu konfirmasi admin.</span>';
-                    } else if (status === 'rejected') {
-                        resultBox.innerHTML = '<span style="color: #ff5252;">❌ Pendaftaran kamu DITOLAK. Hubungi admin.</span>';
-                    }
-                } else {
-                    resultBox.innerHTML = '<span style="color: #ff5252;">⚠️ Username tidak ditemukan.</span>';
+                    showLoginMessage(data.message, 'error');
                 }
             } catch (error) {
-                resultBox.innerHTML = '<span style="color: #ff5252;">⚠️ Gagal terhubung ke server.</span>';
+                showLoginMessage('Terjadi kesalahan. Silakan coba lagi.', 'error');
+            }
+        });
+
+        function showLoginMessage(text, type) {
+            const message = document.getElementById('loginMessage');
+            message.textContent = text;
+            message.className = `login-message ${type}`;
+            message.style.display = 'block';
+            setTimeout(() => { message.style.display = 'none'; }, 3000);
+        }
+
+        function showDashboard() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('adminName').textContent = adminName;
+            loadUsers();
+        }
+
+        function logout() {
+            isAdminLoggedIn = false;
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminName');
+            document.getElementById('loginModal').style.display = 'flex';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+        }
+
+        async function loadUsers() {
+            const tableBody = document.getElementById('usersTableBody');
+
+            tableBody.innerHTML = `
+                <tr class="loading-row">
+                    <td colspan="7"><span class="spinner"></span> Memuat data...</td>
+                </tr>`;
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/users`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const users = data.users;
+
+                    // Update stats
+                    document.getElementById('totalUsers').textContent = users.length;
+                    document.getElementById('pendingUsers').textContent = users.filter(u => u.status === 'pending').length;
+                    document.getElementById('approvedUsers').textContent = users.filter(u => u.status === 'approved').length;
+                    document.getElementById('rejectedUsers').textContent = users.filter(u => u.status === 'rejected').length;
+
+                    if (users.length === 0) {
+                        tableBody.innerHTML = `
+                            <tr class="empty-row">
+                                <td colspan="7">
+                                    <div class="empty-state-icon">📭</div>
+                                    <div class="empty-state-text">Belum ada user terdaftar</div>
+                                </td>
+                            </tr>`;
+                    } else {
+                        tableBody.innerHTML = '';
+                        users.forEach(user => {
+                            const bytesIn = formatBytes(user.bytesIn || 0);
+                            const bytesOut = formatBytes(user.bytesOut || 0);
+                            const uptime = user.uptime || 'Off';
+
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>
+                                    <div class="user-name">${user.name}</div>
+                                    <div class="user-email">${user.email}</div>
+                                </td>
+                                <td>${user.username}</td>
+                                <td>${user.phone || '-'}</td>
+                                <td><span class="status ${user.status}">${user.status}</span></td>
+                                <td>${new Date(user.timestamp).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                                <td>
+                                    <div class="traffic-info">
+                                        ⏱️ <span>${uptime}</span><br>
+                                        ⬇️ <span>${bytesOut}</span> · ⬆️ <span>${bytesIn}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="actions">
+                                        <button class="action-btn approve-btn"
+                                            onclick="approveUser('${user.username}')"
+                                            ${user.status !== 'pending' ? 'disabled' : ''}>
+                                            ✓ Approve
+                                        </button>
+                                        <button class="action-btn reject-btn"
+                                            onclick="rejectUser('${user.username}')"
+                                            ${user.status !== 'pending' ? 'disabled' : ''}>
+                                            ✗ Reject
+                                        </button>
+                                        <button class="action-btn delete-btn"
+                                            onclick="deleteUser('${user.username}')">
+                                            🗑 Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                    }
+                }
+            } catch (error) {
+                showMessage('Gagal memuat data user', 'error');
+                tableBody.innerHTML = `
+                    <tr class="empty-row">
+                        <td colspan="7">
+                            <div class="empty-state-icon">⚠️</div>
+                            <div class="empty-state-text">Gagal memuat data. Coba refresh.</div>
+                        </td>
+                    </tr>`;
             }
         }
+
+        async function approveUser(username) {
+            if (!confirm(`Approve user ${username}?`)) return;
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/approve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, adminName })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(`User ${username} berhasil diapprove`, 'success');
+                    loadUsers();
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Gagal approve user', 'error');
+            }
+        }
+
+        async function rejectUser(username) {
+            if (!confirm(`Reject user ${username}?`)) return;
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/reject`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, adminName })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(`User ${username} berhasil direject`, 'success');
+                    loadUsers();
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Gagal reject user', 'error');
+            }
+        }
+
+        async function deleteUser(username) {
+            if (!confirm(`Hapus user ${username}?`)) return;
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/users/${username}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(`User ${username} berhasil dihapus`, 'success');
+                    loadUsers();
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Gagal menghapus user', 'error');
+            }
+        }
+
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.style.display = 'block';
+            setTimeout(() => { message.style.display = 'none'; }, 3000);
+        }
+
+        // Auto refresh every 30 seconds
+        setInterval(() => {
+            if (isAdminLoggedIn) loadUsers();
+        }, 30000);
     </script>
 </body>
 </html>
