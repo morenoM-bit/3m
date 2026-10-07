@@ -48,7 +48,7 @@
             margin: 0 auto;
         }
 
-        /* ======= LOGIN MODAL ======= */
+        /* LOGIN MODAL */
         .login-modal {
             position: fixed;
             inset: 0;
@@ -91,534 +91,171 @@
             50% { box-shadow: 0 0 50px rgba(0,212,255,0.7); }
         }
 
-        .login-box h2 {
-            color: #fff;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
+        .login-box h2 { color: #fff; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .login-box p { color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 24px; }
 
-        .login-box p {
-            color: rgba(255,255,255,0.4);
-            font-size: 13px;
-            margin-bottom: 24px;
-        }
-
-        .login-box .input-wrapper {
-            position: relative;
-            margin-bottom: 14px;
-        }
-
+        .login-box .input-wrapper { position: relative; margin-bottom: 14px; }
         .login-box .input-icon {
-            position: absolute;
-            left: 13px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 16px;
-            opacity: 0.5;
-            pointer-events: none;
+            position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+            font-size: 16px; opacity: 0.5; pointer-events: none;
         }
 
         .login-box input {
-            width: 100%;
-            padding: 13px 15px 13px 42px;
-            background: rgba(255,255,255,0.07);
-            border: 1.5px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            font-size: 14px;
-            font-family: inherit;
-            color: #fff;
-            transition: all 0.3s;
+            width: 100%; padding: 13px 15px 13px 42px;
+            background: rgba(255,255,255,0.07); border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 12px; font-size: 14px; font-family: inherit; color: #fff; transition: all 0.3s;
         }
 
         .login-box input::placeholder { color: rgba(255,255,255,0.3); }
         .login-box input:focus {
-            outline: none;
-            border-color: #00d4ff;
-            background: rgba(0,212,255,0.08);
+            outline: none; border-color: #00d4ff; background: rgba(0,212,255,0.08);
             box-shadow: 0 0 0 3px rgba(0,212,255,0.15);
         }
 
         .login-box button[type="submit"] {
-            width: 100%;
-            padding: 13px;
-            background: linear-gradient(135deg, #00d4ff, #007aff);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 4px;
+            width: 100%; padding: 13px; background: linear-gradient(135deg, #00d4ff, #007aff);
+            color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 600;
+            font-family: inherit; cursor: pointer; transition: all 0.3s; margin-top: 4px;
         }
 
         .login-box button[type="submit"]:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(0,122,255,0.4);
+            transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,122,255,0.4);
         }
 
         .login-message {
-            padding: 10px 14px;
-            border-radius: 10px;
-            margin-top: 12px;
-            display: none;
-            font-size: 13px;
-            font-weight: 500;
+            padding: 10px 14px; border-radius: 10px; margin-top: 12px;
+            display: none; font-size: 13px; font-weight: 500;
         }
 
         .login-message.error {
-            background: rgba(255,82,82,0.15);
-            color: #ff5252;
-            border: 1px solid rgba(255,82,82,0.3);
+            background: rgba(255,82,82,0.15); color: #ff5252; border: 1px solid rgba(255,82,82,0.3);
         }
 
-        /* ======= DASHBOARD ======= */
+        /* DASHBOARD */
         .dashboard { display: none; }
 
-        /* Top navbar */
         .navbar {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 16px 24px;
-            margin-bottom: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px; padding: 16px 24px; margin-bottom: 24px;
+            display: flex; justify-content: space-between; align-items: center;
             backdrop-filter: blur(10px);
         }
 
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        .navbar-brand { display: flex; align-items: center; gap: 12px; }
         .navbar-logo {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #00d4ff, #007aff);
-            border-radius: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            box-shadow: 0 0 15px rgba(0,212,255,0.35);
+            width: 40px; height: 40px; background: linear-gradient(135deg, #00d4ff, #007aff);
+            border-radius: 11px; display: flex; align-items: center; justify-content: center;
+            font-size: 18px; box-shadow: 0 0 15px rgba(0,212,255,0.35);
         }
 
-        .navbar-title {
-            font-size: 17px;
-            font-weight: 700;
-            color: #fff;
-        }
-
+        .navbar-title { font-size: 17px; font-weight: 700; color: #fff; }
         .navbar-title span { color: #00d4ff; }
+        .navbar-subtitle { font-size: 11px; color: rgba(255,255,255,0.35); letter-spacing: 1px; text-transform: uppercase; }
 
-        .navbar-subtitle {
-            font-size: 11px;
-            color: rgba(255,255,255,0.35);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .navbar-right {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
+        .navbar-right { display: flex; align-items: center; gap: 14px; }
         .admin-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(0,212,255,0.08);
-            border: 1px solid rgba(0,212,255,0.2);
-            border-radius: 30px;
-            padding: 6px 14px;
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2);
+            border-radius: 30px; padding: 6px 14px;
         }
 
         .admin-dot {
-            width: 8px;
-            height: 8px;
-            background: #00e676;
-            border-radius: 50%;
-            box-shadow: 0 0 8px rgba(0,230,118,0.7);
-            animation: blink 1.5s ease-in-out infinite;
+            width: 8px; height: 8px; background: #00e676; border-radius: 50%;
+            box-shadow: 0 0 8px rgba(0,230,118,0.7); animation: blink 1.5s ease-in-out infinite;
         }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-        .admin-badge span {
-            font-size: 13px;
-            font-weight: 500;
-            color: rgba(255,255,255,0.8);
-        }
+        .admin-badge span { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.8); }
 
         .logout-btn {
-            padding: 9px 18px;
-            background: rgba(255,82,82,0.12);
-            color: #ff5252;
-            border: 1px solid rgba(255,82,82,0.25);
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            font-family: inherit;
-            transition: all 0.2s;
+            padding: 9px 18px; background: rgba(255,82,82,0.12); color: #ff5252;
+            border: 1px solid rgba(255,82,82,0.25); border-radius: 10px; cursor: pointer;
+            font-weight: 600; font-size: 13px; font-family: inherit; transition: all 0.2s;
         }
 
-        .logout-btn:hover {
-            background: rgba(255,82,82,0.22);
-        }
+        .logout-btn:hover { background: rgba(255,82,82,0.22); }
 
-        /* Stats grid */
         .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px; margin-bottom: 24px;
         }
 
         .stat-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 22px 24px;
-            backdrop-filter: blur(10px);
-            transition: border-color 0.2s, transform 0.2s;
-            position: relative;
-            overflow: hidden;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px; padding: 22px 24px; backdrop-filter: blur(10px);
+            transition: border-color 0.2s, transform 0.2s; position: relative; overflow: hidden;
         }
 
-        .stat-card:hover {
-            border-color: rgba(0,212,255,0.25);
-            transform: translateY(-2px);
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            border-radius: 16px 16px 0 0;
-        }
-
+        .stat-card:hover { border-color: rgba(0,212,255,0.25); transform: translateY(-2px); }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
         .stat-card:nth-child(1)::before { background: linear-gradient(90deg, #00d4ff, #007aff); }
         .stat-card:nth-child(2)::before { background: linear-gradient(90deg, #ffc107, #ff9800); }
         .stat-card:nth-child(3)::before { background: linear-gradient(90deg, #00e676, #00b0ff); }
         .stat-card:nth-child(4)::before { background: linear-gradient(90deg, #ff5252, #f50057); }
 
-        .stat-icon {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
+        .stat-icon { font-size: 24px; margin-bottom: 10px; }
+        .stat-label { font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 500; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+        .stat-number { font-size: 36px; font-weight: 800; color: #fff; line-height: 1; }
 
-        .stat-label {
-            font-size: 12px;
-            color: rgba(255,255,255,0.4);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-        }
-
-        .stat-number {
-            font-size: 36px;
-            font-weight: 800;
-            color: #fff;
-            line-height: 1;
-        }
-
-        /* Users section */
         .users-section {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px;
-            padding: 28px;
-            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px; padding: 28px; backdrop-filter: blur(10px);
         }
 
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .section-title {
-            font-size: 17px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .section-title span {
-            color: rgba(255,255,255,0.4);
-            font-size: 13px;
-            font-weight: 400;
-            margin-left: 8px;
-        }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+        .section-title { font-size: 17px; font-weight: 700; color: #fff; }
+        .section-title span { color: rgba(255,255,255,0.4); font-size: 13px; font-weight: 400; margin-left: 8px; }
 
         .refresh-btn {
-            padding: 9px 18px;
-            background: rgba(0,212,255,0.1);
-            color: #00d4ff;
-            border: 1px solid rgba(0,212,255,0.25);
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            font-family: inherit;
-            transition: all 0.2s;
+            padding: 9px 18px; background: rgba(0,212,255,0.1); color: #00d4ff;
+            border: 1px solid rgba(0,212,255,0.25); border-radius: 10px; cursor: pointer;
+            font-size: 13px; font-weight: 600; font-family: inherit; transition: all 0.2s;
         }
 
-        .refresh-btn:hover {
-            background: rgba(0,212,255,0.2);
-        }
+        .refresh-btn:hover { background: rgba(0,212,255,0.2); }
 
-        /* Message banner */
-        .message {
-            padding: 12px 16px;
-            border-radius: 10px;
-            margin-bottom: 16px;
-            display: none;
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        .message.success {
-            background: rgba(0,230,118,0.13);
-            color: #00e676;
-            border: 1px solid rgba(0,230,118,0.3);
-        }
-
-        .message.error {
-            background: rgba(255,82,82,0.13);
-            color: #ff5252;
-            border: 1px solid rgba(255,82,82,0.3);
-        }
-
-        /* Table */
-        .table-container {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.07);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 800px;
-        }
-
-        thead {
-            background: rgba(0,212,255,0.05);
-        }
+        .table-container { overflow-x: auto; border-radius: 12px; border: 1px solid rgba(255,255,255,0.07); }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        thead { background: rgba(0,212,255,0.05); }
 
         th {
-            padding: 14px 16px;
-            text-align: left;
-            color: rgba(255,255,255,0.5);
-            font-weight: 600;
-            font-size: 12px;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
-            white-space: nowrap;
+            padding: 14px 16px; text-align: left; color: rgba(255,255,255,0.5);
+            font-weight: 600; font-size: 12px; letter-spacing: 0.8px; text-transform: uppercase;
+            border-bottom: 1px solid rgba(255,255,255,0.07); white-space: nowrap;
         }
 
-        td {
-            padding: 14px 16px;
-            color: rgba(255,255,255,0.75);
-            font-size: 13px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            vertical-align: middle;
-        }
+        td { padding: 14px 16px; color: rgba(255,255,255,0.75); font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: middle; }
+        tbody tr:hover { background: rgba(255,255,255,0.03); }
 
-        tbody tr {
-            transition: background 0.2s;
-        }
-
-        tbody tr:hover {
-            background: rgba(255,255,255,0.03);
-        }
-
-        tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* Status badges */
-        .status {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            display: inline-block;
-        }
-
-        .status.pending {
-            background: rgba(255,193,7,0.15);
-            color: #ffc107;
-            border: 1px solid rgba(255,193,7,0.3);
-        }
-
-        .status.approved {
-            background: rgba(0,230,118,0.13);
-            color: #00e676;
-            border: 1px solid rgba(0,230,118,0.3);
-        }
-
-        .status.rejected {
-            background: rgba(255,82,82,0.13);
-            color: #ff5252;
-            border: 1px solid rgba(255,82,82,0.3);
-        }
-
-        /* Traffic info */
-        .traffic-info {
-            font-size: 12px;
-            color: rgba(255,255,255,0.45);
-            line-height: 1.7;
-        }
-
-        .traffic-info span {
-            font-weight: 600;
-            color: rgba(255,255,255,0.75);
-        }
-
-        /* Action buttons */
-        .actions {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
+        .status { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; display: inline-block; }
+        .status.pending { background: rgba(255,193,7,0.15); color: #ffc107; border: 1px solid rgba(255,193,7,0.3); }
+        .status.approved { background: rgba(0,230,118,0.13); color: #00e676; border: 1px solid rgba(0,230,118,0.3); }
+        .status.rejected { background: rgba(255,82,82,0.13); color: #ff5252; border: 1px solid rgba(255,82,82,0.3); }
 
         .action-btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 7px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
-            font-family: inherit;
-            transition: all 0.2s;
-            white-space: nowrap;
+            padding: 6px 12px; border: none; border-radius: 7px; cursor: pointer;
+            font-size: 11px; font-weight: 600; font-family: inherit; transition: all 0.2s; white-space: nowrap;
         }
 
-        .action-btn:hover:not(:disabled) {
-            transform: translateY(-1px);
-        }
-
-        .approve-btn {
-            background: rgba(0,230,118,0.15);
-            color: #00e676;
-            border: 1px solid rgba(0,230,118,0.3);
-        }
-
-        .approve-btn:hover:not(:disabled) {
-            background: rgba(0,230,118,0.25);
-        }
-
-        .reject-btn {
-            background: rgba(255,82,82,0.13);
-            color: #ff5252;
-            border: 1px solid rgba(255,82,82,0.3);
-        }
-
-        .reject-btn:hover:not(:disabled) {
-            background: rgba(255,82,82,0.23);
-        }
-
-        .delete-btn {
-            background: rgba(255,255,255,0.06);
-            color: rgba(255,255,255,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .delete-btn:hover:not(:disabled) {
-            background: rgba(255,255,255,0.12);
-            color: rgba(255,255,255,0.8);
-        }
-
-        .action-btn:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Loading state */
-        .loading-row td {
-            text-align: center;
-            padding: 40px;
-            color: rgba(255,255,255,0.3);
-            font-size: 14px;
-        }
+        .approve-btn { background: rgba(0,230,118,0.15); color: #00e676; border: 1px solid rgba(0,230,118,0.3); }
+        .approve-btn:hover:not(:disabled) { background: rgba(0,230,118,0.25); }
 
         .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2.5px solid rgba(0,212,255,0.2);
-            border-radius: 50%;
-            border-top-color: #00d4ff;
-            animation: spin 0.8s linear infinite;
-            margin-right: 10px;
-            vertical-align: middle;
+            display: inline-block; width: 20px; height: 20px; border: 2.5px solid rgba(0,212,255,0.2);
+            border-radius: 50%; border-top-color: #00d4ff; animation: spin 0.8s linear infinite; margin-right: 10px; vertical-align: middle;
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
+        .empty-row td, .loading-row td { text-align: center; padding: 40px; color: rgba(255,255,255,0.3); }
+        .user-name { font-weight: 600; color: #fff; }
+        .user-email { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px; }
 
-        /* Empty state */
-        .empty-row td {
-            text-align: center;
-            padding: 50px;
-        }
-
-        .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-            opacity: 0.4;
-        }
-
-        .empty-state-text {
-            color: rgba(255,255,255,0.3);
-            font-size: 14px;
-        }
-
-        /* User name cell */
-        .user-name {
-            font-weight: 600;
-            color: #fff;
-        }
-
-        .user-email {
-            font-size: 11px;
-            color: rgba(255,255,255,0.35);
-            margin-top: 2px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            body { padding: 14px; }
-            .navbar { padding: 14px 16px; }
-            .navbar-subtitle { display: none; }
-            .users-section { padding: 20px 16px; }
-        }
+        @media (max-width: 768px) { body { padding: 14px; } .navbar { padding: 14px 16px; } .users-section { padding: 20px 16px; } }
     </style>
 </head>
 <body>
 
-    <!-- ===== LOGIN MODAL ===== -->
     <div class="login-modal" id="loginModal">
         <div class="login-box">
             <div class="login-box-logo">📡</div>
@@ -635,10 +272,7 @@
         </div>
     </div>
 
-    <!-- ===== DASHBOARD ===== -->
     <div class="page-content dashboard" id="dashboard">
-
-        <!-- Navbar -->
         <div class="navbar">
             <div class="navbar-brand">
                 <div class="navbar-logo">📡</div>
@@ -656,7 +290,6 @@
             </div>
         </div>
 
-        <!-- Stats -->
         <div class="stats">
             <div class="stat-card">
                 <div class="stat-icon">👥</div>
@@ -680,7 +313,6 @@
             </div>
         </div>
 
-        <!-- Users table -->
         <div class="users-section">
             <div class="section-header">
                 <div class="section-title">
@@ -690,10 +322,8 @@
                 <button class="refresh-btn" onclick="loadUsers()">🔄 Refresh</button>
             </div>
 
-            <div class="message" id="message"></div>
-
             <div class="table-container">
-                <table id="usersTable">
+                <table>
                     <thead>
                         <tr>
                             <th>Pengguna</th>
@@ -701,50 +331,30 @@
                             <th>Telepon</th>
                             <th>Status</th>
                             <th>Tanggal Daftar</th>
-                            <th>Penggunaan Traffic</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="usersTableBody">
                         <tr class="loading-row">
-                            <td colspan="7">
-                                <span class="spinner"></span>
-                                Memuat data...
-                            </td>
+                            <td colspan="6"><span class="spinner"></span> Memuat data...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-
     </div>
 
     <script>
-        // Konfigurasi Alamat Backend
-        const BACKEND_URL = window.location.origin.includes('vercel.app') 
-            ? window.location.origin 
-            : 'https://nama-proyek-kamu.vercel.app';
-
+        const BACKEND_URL = window.location.origin;
         let isAdminLoggedIn = false;
         let adminName = 'Admin';
 
-        // Format Byte ke KB, MB, atau GB
-        function formatBytes(bytes) {
-            if (!bytes || bytes == 0) return '0 B';
-            const k = 1024;
-            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        // Check if already logged in
         if (localStorage.getItem('adminLoggedIn') === 'true') {
             isAdminLoggedIn = true;
             adminName = localStorage.getItem('adminName') || 'Admin';
             showDashboard();
         }
 
-        // Login form
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const password = document.getElementById('adminPassword').value;
@@ -767,7 +377,7 @@
                     showLoginMessage(data.message, 'error');
                 }
             } catch (error) {
-                showLoginMessage('Terjadi kesalahan. Silakan coba lagi.', 'error');
+                showLoginMessage('Gagal terhubung ke server backend.', 'error');
             }
         });
 
@@ -795,75 +405,61 @@
             document.getElementById('adminPassword').value = '';
         }
 
+        async function approveUser(username) {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/approve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, adminName })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('User berhasil disetujui');
+                    loadUsers();
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                alert('Gagal menyetujui user');
+            }
+        }
+
         async function loadUsers() {
             const tableBody = document.getElementById('usersTableBody');
-
-            tableBody.innerHTML = `
-                <tr class="loading-row">
-                    <td colspan="7"><span class="spinner"></span> Memuat data...</td>
-                </tr>`;
+            tableBody.innerHTML = `<tr class="loading-row"><td colspan="6"><span class="spinner"></span> Memuat data...</td></tr>`;
 
             try {
                 const response = await fetch(`${BACKEND_URL}/api/users`);
                 const data = await response.json();
 
                 if (data.success) {
-                    const users = data.users;
+                    const users = data.users || [];
 
-                    // Update stats
                     document.getElementById('totalUsers').textContent = users.length;
                     document.getElementById('pendingUsers').textContent = users.filter(u => u.status === 'pending').length;
                     document.getElementById('approvedUsers').textContent = users.filter(u => u.status === 'approved').length;
                     document.getElementById('rejectedUsers').textContent = users.filter(u => u.status === 'rejected').length;
 
                     if (users.length === 0) {
-                        tableBody.innerHTML = `
-                            <tr class="empty-row">
-                                <td colspan="7">
-                                    <div class="empty-state-icon">📭</div>
-                                    <div class="empty-state-text">Belum ada user terdaftar</div>
-                                </td>
-                            </tr>`;
+                        tableBody.innerHTML = `<tr class="empty-row"><td colspan="6">Belum ada user terdaftar</td></tr>`;
                     } else {
                         tableBody.innerHTML = '';
                         users.forEach(user => {
-                            const bytesIn = formatBytes(user.bytesIn || 0);
-                            const bytesOut = formatBytes(user.bytesOut || 0);
-                            const uptime = user.uptime || 'Off';
-
                             const row = document.createElement('tr');
+                            const dateStr = user.timestamp ? new Date(user.timestamp).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
                             row.innerHTML = `
                                 <td>
-                                    <div class="user-name">${user.name}</div>
-                                    <div class="user-email">${user.email}</div>
+                                    <div class="user-name">${user.name || user.username}</div>
+                                    <div class="user-email">${user.email || '-'}</div>
                                 </td>
                                 <td>${user.username}</td>
                                 <td>${user.phone || '-'}</td>
                                 <td><span class="status ${user.status}">${user.status}</span></td>
-                                <td>${new Date(user.timestamp).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                                <td>${dateStr}</td>
                                 <td>
-                                    <div class="traffic-info">
-                                        ⏱️ <span>${uptime}</span><br>
-                                        ⬇️ <span>${bytesOut}</span> · ⬆️ <span>${bytesIn}</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="actions">
-                                        <button class="action-btn approve-btn"
-                                            onclick="approveUser('${user.username}')"
-                                            ${user.status !== 'pending' ? 'disabled' : ''}>
-                                            ✓ Approve
-                                        </button>
-                                        <button class="action-btn reject-btn"
-                                            onclick="rejectUser('${user.username}')"
-                                            ${user.status !== 'pending' ? 'disabled' : ''}>
-                                            ✗ Reject
-                                        </button>
-                                        <button class="action-btn delete-btn"
-                                            onclick="deleteUser('${user.username}')">
-                                            🗑 Delete
-                                        </button>
-                                    </div>
+                                    ${user.status === 'pending' 
+                                        ? `<button class="action-btn approve-btn" onclick="approveUser('${user.username}')">Setujui</button>` 
+                                        : '-'}
                                 </td>
                             `;
                             tableBody.appendChild(row);
@@ -871,96 +467,9 @@
                     }
                 }
             } catch (error) {
-                showMessage('Gagal memuat data user', 'error');
-                tableBody.innerHTML = `
-                    <tr class="empty-row">
-                        <td colspan="7">
-                            <div class="empty-state-icon">⚠️</div>
-                            <div class="empty-state-text">Gagal memuat data. Coba refresh.</div>
-                        </td>
-                    </tr>`;
+                tableBody.innerHTML = `<tr class="empty-row"><td colspan="6">Gagal memuat data dari server.</td></tr>`;
             }
         }
-
-        async function approveUser(username) {
-            if (!confirm(`Approve user ${username}?`)) return;
-
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/approve`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, adminName })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showMessage(`User ${username} berhasil diapprove`, 'success');
-                    loadUsers();
-                } else {
-                    showMessage(data.message, 'error');
-                }
-            } catch (error) {
-                showMessage('Gagal approve user', 'error');
-            }
-        }
-
-        async function rejectUser(username) {
-            if (!confirm(`Reject user ${username}?`)) return;
-
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/reject`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, adminName })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showMessage(`User ${username} berhasil direject`, 'success');
-                    loadUsers();
-                } else {
-                    showMessage(data.message, 'error');
-                }
-            } catch (error) {
-                showMessage('Gagal reject user', 'error');
-            }
-        }
-
-        async function deleteUser(username) {
-            if (!confirm(`Hapus user ${username}?`)) return;
-
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/users/${username}`, {
-                    method: 'DELETE'
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showMessage(`User ${username} berhasil dihapus`, 'success');
-                    loadUsers();
-                } else {
-                    showMessage(data.message, 'error');
-                }
-            } catch (error) {
-                showMessage('Gagal menghapus user', 'error');
-            }
-        }
-
-        function showMessage(text, type) {
-            const message = document.getElementById('message');
-            message.textContent = text;
-            message.className = `message ${type}`;
-            message.style.display = 'block';
-            setTimeout(() => { message.style.display = 'none'; }, 3000);
-        }
-
-        // Auto refresh every 30 seconds
-        setInterval(() => {
-            if (isAdminLoggedIn) loadUsers();
-        }, 30000);
     </script>
 </body>
 </html>
