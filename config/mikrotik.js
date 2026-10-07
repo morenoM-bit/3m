@@ -61,22 +61,35 @@ class MikrotikConfig {
     }
   }
 
-  // 3. Ambil Statistik User (Uptime & Traffic)
+  // 3. Ambil Statistik User (Real-time Active + Persistent User Stats)
   async getUsersStats() {
     const client = this.getClient();
     try {
       const api = await client.connect();
-      const mtUsers = await api.menu('/ip/hotspot/user').get();
-      const mtActive = await api.menu('/ip/hotspot/active').get();
+      
+      // Mengambil daftar user hotspot dan user aktif secara bersamaan
+      const mtUsers = await api.menu('/ip/hotspot/user').get().catch(() => []);
+      const mtActive = await api.menu('/ip/hotspot/active').get().catch(() => []);
       
       return mtUsers.map(u => {
+        // Cari sesi aktif dari /ip/hotspot/active
         const active = mtActive.find(act => act.user && act.user.toLowerCase() === u.name.toLowerCase());
+        
+        // Prioritaskan data real-time dari active session jika user sedang online
+        const bytesIn = active ? (active['bytes-in'] || active['bytes-in-total'] || u['bytes-in'] || 0) : (u['bytes-in'] || 0);
+        const bytesOut = active ? (active['bytes-out'] || active['bytes-out-total'] || u['bytes-out'] || 0) : (u['bytes-out'] || 0);
+        const packetsIn = active ? (active['packets-in'] || u['packets-in'] || 0) : (u['packets-in'] || 0);
+        const packetsOut = active ? (active['packets-out'] || u['packets-out'] || 0) : (u['packets-out'] || 0);
+        const uptime = active ? `${active.uptime} (Online)` : (u.uptime || '00:00:00');
+
         return {
           name: u.name,
           user: u.name,
-          'bytes-in': u['bytes-in'] || 0,
-          'bytes-out': u['bytes-out'] || 0,
-          uptime: active ? `${active.uptime} (Online)` : (u.uptime || 'Off')
+          uptime: uptime,
+          'bytes-in': bytesIn,
+          'bytes-out': bytesOut,
+          'packets-in': packetsIn,
+          'packets-out': packetsOut
         };
       });
     } catch (error) {
