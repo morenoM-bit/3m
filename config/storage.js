@@ -46,9 +46,9 @@ class StorageConfig {
       const newUser = {
         id: Date.now().toString(),
         timestamp,
-        name: userData.name,
-        email: userData.email,
-        phone: userData.phone,
+        name: userData.fullName || userData.name || userData.username,
+        email: userData.email || '',
+        phone: userData.phone || '',
         username: userData.username,
         password: userData.password,
         status: 'pending',
