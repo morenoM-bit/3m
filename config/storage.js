@@ -11,14 +11,12 @@ class StorageConfig {
 
   async initialize() {
     try {
-      // Ambil data users dari Upstash Redis Cloud
       const existingData = await this.redis.get(this.redisKey);
       
       if (existingData) {
         this.data = typeof existingData === 'string' ? JSON.parse(existingData) : existingData;
         console.log('Storage loaded successfully from Upstash Redis');
       } else {
-        // Jika Redis masih kosong, simpan struktur awal
         await this.saveData();
         console.log('Storage initialized successfully on Upstash Redis');
       }
@@ -30,7 +28,6 @@ class StorageConfig {
 
   async saveData() {
     try {
-      // Simpan seluruh object this.data ke Upstash Redis
       await this.redis.set(this.redisKey, JSON.stringify(this.data));
     } catch (error) {
       console.error('Error saving data:', error);
@@ -40,7 +37,7 @@ class StorageConfig {
 
   async addUser(userData) {
     try {
-      await this.initialize(); // Sinkronisasi data terbaru dari Redis
+      await this.initialize();
       
       const timestamp = new Date().toISOString();
       const newUser = {
@@ -68,7 +65,7 @@ class StorageConfig {
 
   async getAllUsers() {
     try {
-      await this.initialize(); // Sinkronisasi data terbaru dari Redis
+      await this.initialize();
       return this.data.users;
     } catch (error) {
       console.error('Error getting users:', error);
@@ -78,7 +75,7 @@ class StorageConfig {
 
   async approveUser(username, adminName) {
     try {
-      await this.initialize(); // Sinkronisasi data terbaru dari Redis
+      await this.initialize();
       const userIndex = this.data.users.findIndex(u => u.username === username);
       
       if (userIndex === -1) {
@@ -100,7 +97,7 @@ class StorageConfig {
 
   async rejectUser(username, adminName) {
     try {
-      await this.initialize(); // Sinkronisasi data terbaru dari Redis
+      await this.initialize();
       const userIndex = this.data.users.findIndex(u => u.username === username);
       
       if (userIndex === -1) {
@@ -122,7 +119,7 @@ class StorageConfig {
 
   async getUserByUsername(username) {
     try {
-      await this.initialize(); // Sinkronisasi data terbaru dari Redis
+      await this.initialize();
       return this.data.users.find(u => u.username === username) || null;
     } catch (error) {
       console.error('Error getting user:', error);
@@ -132,7 +129,7 @@ class StorageConfig {
 
   async deleteUser(username) {
     try {
-      await this.initialize(); // Sinkronisasi data terbaru dari Redis
+      await this.initialize();
       const userIndex = this.data.users.findIndex(u => u.username === username);
       
       if (userIndex === -1) {
